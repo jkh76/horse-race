@@ -1,0 +1,1576 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>경주마 레이스</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 둥근 하늘색 무대 카드 한 장 안에 위에서 아래로 배지·제목 → 입력 카드 → LIVE 바 → 초록 테두리 흙길 경주로 → 메달 순위표. */
+:root {
+  --page: #F4F6F9;
+  --sky-a: #D6EFF8;
+  --sky-b: #DCF6E7;
+  --sky-line: #C7E7EE;
+  --fg: #1B2433;
+  --muted: #526076;
+  --title: #0E5A3A;
+  --title-shadow: 0 2px 0 rgba(255, 255, 255, 0.75);
+  --card: #FFFFFF;
+  --card-line: #BDEADB;
+  --field: #FFFFFF;
+  --field-line: #C3D2E3;
+  --chip: #FFFFFF;
+  --pill-bg: #F1F5FA;
+  --pill-line: #D3DDE8;
+  --blue: #0E96DC;
+  --blue-deep: #0A6FA3;
+  --grey-btn: #E4E8EF;
+  --grey-deep: #C0C8D6;
+  --grey-fg: #3B465A;
+  --green: #12A15F;
+  --green-deep: #0A7444;
+  --green-solid: #0E8A52;
+  --green-text: #0A7444;
+  --badge: #FFC62F;
+  --badge-fg: #5A3A00;
+  --navy: #12183A;
+  --navy-line: #232A57;
+  --live: #FF6B88;
+  --live-bg: #54152C;
+  --cyan: #5EE6D2;
+  --yellow-text: #FFD54A;
+  --dirt: #9C6B49;
+  --dirt-line: rgba(255, 255, 255, 0.38);
+  --frame: #0D7A55;
+  --edge: #86380F;
+  --res-line: #FFD64F;
+  --res-tint: #FFFBEA;
+  --row-bg: #FFFFFF;
+  --row-line: #E1E7EF;
+  --gold-bg: #FFF3BA;
+  --gold-line: #F2B71F;
+  --silver-bg: #EEF1F9;
+  --silver-line: #A3ADCB;
+  --bronze-bg: #FFF1E1;
+  --bronze-line: #F4B27A;
+  --medal-gold: #F5A21B;
+  --medal-gold-fg: #4A2C00;
+  --medal-silver: #5F6C87;
+  --medal-bronze: #C8400B;
+  --medal-navy: #1F2A47;
+  --st-wait-bg: #EEF2F7;
+  --st-wait-fg: #4C586E;
+  --st-run-bg: #FFEFBD;
+  --st-run-fg: #7A4B00;
+  --st-done-bg: #D6F5E4;
+  --st-done-fg: #0A6F42;
+  --danger: #C62F2F;
+  --focus: #2F6FEB;
+  --font-display: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-body: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --hw: 62px;
+  --lh: 70px;
+  --th: 20px;
+}
+@media (min-width: 560px) {
+  :root { --hw: 88px; --lh: 88px; --th: 22px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0A0F1A;
+    --sky-a: #10283C;
+    --sky-b: #10332E;
+    --sky-line: #1E4A55;
+    --fg: #E8EEF8;
+    --muted: #A5B3C9;
+    --title: #8FE9BC;
+    --title-shadow: none;
+    --card: #162033;
+    --card-line: #285A58;
+    --field: #0F1727;
+    --field-line: #33445F;
+    --chip: #1B2840;
+    --pill-bg: #1B2840;
+    --pill-line: #33445F;
+    --blue: #1597DC;
+    --blue-deep: #0B5F8E;
+    --grey-btn: #2B3850;
+    --grey-deep: #1A2336;
+    --grey-fg: #E1E8F4;
+    --green-solid: #0F8F55;
+    --green-text: #7CE3AE;
+    --navy: #0B1030;
+    --frame: #0B6A49;
+    --edge: #6D2D0B;
+    --res-line: #B88A12;
+    --res-tint: #1B2438;
+    --row-bg: #1B2840;
+    --row-line: #2C3B57;
+    --gold-bg: #3B3216;
+    --gold-line: #C79A1B;
+    --silver-bg: #252E46;
+    --silver-line: #6C7AA3;
+    --bronze-bg: #3A281C;
+    --bronze-line: #B8743F;
+    --st-wait-bg: #243149;
+    --st-wait-fg: #B4C1D6;
+    --st-run-bg: #4A3A0F;
+    --st-run-fg: #FFD875;
+    --st-done-bg: #11402D;
+    --st-done-fg: #8CE9B9;
+    --danger: #FF8A8A;
+    --focus: #7AA2FF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0A0F1A;
+  --sky-a: #10283C;
+  --sky-b: #10332E;
+  --sky-line: #1E4A55;
+  --fg: #E8EEF8;
+  --muted: #A5B3C9;
+  --title: #8FE9BC;
+  --title-shadow: none;
+  --card: #162033;
+  --card-line: #285A58;
+  --field: #0F1727;
+  --field-line: #33445F;
+  --chip: #1B2840;
+  --pill-bg: #1B2840;
+  --pill-line: #33445F;
+  --blue: #1597DC;
+  --blue-deep: #0B5F8E;
+  --grey-btn: #2B3850;
+  --grey-deep: #1A2336;
+  --grey-fg: #E1E8F4;
+  --green-solid: #0F8F55;
+  --green-text: #7CE3AE;
+  --navy: #0B1030;
+  --frame: #0B6A49;
+  --edge: #6D2D0B;
+  --res-line: #B88A12;
+  --res-tint: #1B2438;
+  --row-bg: #1B2840;
+  --row-line: #2C3B57;
+  --gold-bg: #3B3216;
+  --gold-line: #C79A1B;
+  --silver-bg: #252E46;
+  --silver-line: #6C7AA3;
+  --bronze-bg: #3A281C;
+  --bronze-line: #B8743F;
+  --st-wait-bg: #243149;
+  --st-wait-fg: #B4C1D6;
+  --st-run-bg: #4A3A0F;
+  --st-run-fg: #FFD875;
+  --st-done-bg: #11402D;
+  --st-done-fg: #8CE9B9;
+  --danger: #FF8A8A;
+  --focus: #7AA2FF;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scrollbar-gutter: stable; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.app { max-width: 620px; margin: 0 auto; }
+.stage-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 14px 24px;
+  border: 1px solid var(--sky-line);
+  border-radius: 30px;
+  background: linear-gradient(180deg, var(--sky-a), var(--sky-b));
+  min-width: 0;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.hero { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--badge);
+  color: var(--badge-fg);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgba(90, 58, 0, 0.18);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(28px, 8.4vw, 42px);
+  line-height: 1.15;
+  color: var(--title);
+  text-shadow: var(--title-shadow);
+  text-wrap: balance;
+}
+.sub { margin: 0; max-width: 34ch; color: var(--muted); font-size: 14px; text-wrap: balance; }
+
+.card {
+  min-width: 0;
+  padding: 18px 16px;
+  border: 2px solid var(--card-line);
+  border-radius: 26px;
+  background: var(--card);
+  box-shadow: 0 6px 18px rgba(20, 120, 110, 0.12);
+}
+.setup h2 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+.cnt { color: var(--green-text); }
+input[type="text"] {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  border: 2px solid var(--field-line);
+  border-radius: 16px;
+  background: var(--field);
+  color: var(--fg);
+  font: inherit;
+  font-size: 16px;
+}
+input[type="text"]::placeholder { color: var(--muted); opacity: 0.8; }
+input[type="text"]:disabled { opacity: 0.55; }
+.btnrow { display: grid; grid-template-columns: 1.15fr 1fr; gap: 12px; margin-top: 12px; padding-bottom: 5px; }
+.b3d {
+  height: 52px;
+  min-width: 0;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--deep);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.b3d:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--deep); }
+.b3d:disabled { opacity: 0.5; cursor: not-allowed; }
+.b3d.blue { background: var(--blue); --deep: var(--blue-deep); }
+.b3d.grey { background: var(--grey-btn); color: var(--grey-fg); --deep: var(--grey-deep); }
+
+.dur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 14px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--pill-line);
+  border-radius: 20px;
+  background: var(--pill-bg);
+}
+.durlabel { flex: none; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.seg { flex: 1; min-width: 190px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.seg label { position: relative; display: block; min-width: 0; }
+.seg span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border: 1.5px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--card);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.seg input:checked + span { background: var(--green-solid); border-color: var(--green-solid); color: #fff; }
+.seg input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.seg input:disabled + span { opacity: 0.5; cursor: not-allowed; }
+
+.msg { min-height: 20px; margin: 6px 0 0; color: var(--danger); font-size: 13px; font-weight: 500; }
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 4px 0 16px;
+  border-bottom: 1.5px solid var(--pill-line);
+  color: var(--muted);
+  font-size: 13px;
+}
+.textbtn {
+  flex: 1 1 140px;
+  min-width: 0;
+  height: 52px;
+  padding: 0 8px;
+  white-space: nowrap;
+  border: 2px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.textbtn#sampleBtn { flex: 1.5 1 0; }
+#soundBtn { flex: 1 1 0; }
+.textbtn:active:not(:disabled) { transform: translateY(1px); }
+.textbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+/* 효과음: 켜짐은 노란색, 꺼짐은 옅은 회색 */
+#soundBtn[aria-pressed="true"] { background: var(--badge); border-color: var(--badge); color: var(--badge-fg); }
+#soundBtn[aria-pressed="false"] { background: var(--grey-btn); border-color: var(--grey-btn); color: var(--muted); }
+.roster { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 8px 7px 14px;
+  border: 2.5px solid var(--c);
+  border-radius: 999px;
+  background: var(--chip);
+  font-weight: 700;
+}
+.dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.cname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.x { flex: none; width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--pill-bg); color: var(--muted); font-size: 17px; line-height: 1; cursor: pointer; }
+.x:hover:not(:disabled) { background: var(--pill-line); color: var(--fg); }
+.x:disabled { opacity: 0.35; cursor: not-allowed; }
+.roster-empty { grid-column: 1 / -1; padding: 14px; border: 1.5px dashed var(--pill-line); border-radius: 16px; color: var(--muted); font-size: 14px; text-align: center; }
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  min-height: 68px;
+  border: 3px solid var(--navy-line);
+  border-radius: 20px;
+  background: var(--navy);
+}
+.livebadge { flex: none; padding: 5px 10px; border-radius: 8px; background: var(--live-bg); color: var(--live); font-size: 12px; font-weight: 900; letter-spacing: 0.08em; }
+.livebadge.on { background: #E11D48; color: #fff; animation: blink 1s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: 0.55; } }
+.status { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 6px; color: var(--yellow-text); font-size: 14px; font-weight: 700; line-height: 1.3; }
+.sti { flex: none; width: 1.5em; text-align: center; }
+.stt { flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.clockpill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding: 7px 12px;
+  border: 1.5px solid #3A4380;
+  border-radius: 999px;
+  background: #1A2150;
+  color: var(--cyan);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tfoot { flex: none; display: flex; justify-content: center; padding-top: 10px; }
+.trackframe { padding: 10px 10px 12px; border: 6px solid var(--edge); border-radius: 26px; background: var(--frame); min-width: 0; }
+.thead { display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px 8px; color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.stage {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(0, 0, 0, 0.22);
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 16px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.1)),
+    var(--dirt);
+}
+.stage.idle .lanes { filter: blur(4px) brightness(0.92); }
+.lanes { position: relative; padding: 6px 14px 6px 52px; transition: filter 0.4s ease; }
+.lanes::before { content: ""; position: absolute; left: 48px; top: 0; bottom: 0; width: 3px; background: rgba(255, 255, 255, 0.85); }
+.lanes::after {
+  content: "";
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 14px;
+  background: repeating-conic-gradient(#F4F5F7 0% 25%, #15171D 0% 50%) 0 0 / 14px 14px;
+}
+.lane { position: relative; height: var(--lh); }
+.lane + .lane { border-top: 2px dashed var(--dirt-line); }
+.numbadge {
+  position: absolute;
+  left: -46px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28);
+}
+.numbadge.bump { animation: bump 0.25s ease-out; }
+@keyframes bump { 0% { transform: translateY(-50%) scale(1.3); } 100% { transform: translateY(-50%) scale(1); } }
+.lanes-empty { min-height: 160px; display: grid; place-items: center; padding: 14px 16px; margin-left: -34px; color: rgba(255, 255, 255, 0.92); font-size: 14px; font-weight: 500; text-align: center; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+
+.cta { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px; pointer-events: none; }
+.cta > * { pointer-events: auto; }
+.startbtn {
+  min-width: 200px;
+  height: 60px;
+  padding: 0 32px;
+  border: 4px solid #fff;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease;
+}
+.startbtn:active:not(:disabled) { transform: scale(0.97); }
+.startbtn:disabled { background: #7D8A99; cursor: not-allowed; }
+
+.countdown { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; pointer-events: none; }
+.countdown span {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 62px;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+  animation: cdpop 0.5s ease-out;
+}
+.countdown span.go { width: 128px; height: 128px; background: #E11D48; font-size: 38px; }
+@keyframes cdpop { from { transform: scale(1.7); opacity: 0; } 60% { opacity: 1; } to { transform: scale(1); opacity: 1; } }
+
+.stage.done .lanes { min-height: 290px; display: flex; flex-direction: column; justify-content: center; }
+/* 전체화면 경주 중에는 우승 표시가 나와도 말 위치가 밀리지 않도록 높이를 늘리지 않음 */
+.arena.full .stage.done .lanes { min-height: 0; }
+.lane { flex: none; }
+.winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 15px 27px 18px;
+  border: 4px solid #F2B71F;
+  border-radius: 33px;
+  background: var(--card);
+  box-shadow: 0 12px 27px rgba(0, 0, 0, 0.3);
+  animation: drop 0.55s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.wlabel { color: var(--muted); font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
+.wname {
+  max-width: 100%;
+  padding: 3px 27px 6px;
+  border-radius: 999px;
+  background: var(--wc, var(--green));
+  color: var(--wt, #fff);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(36px, 10.5vw, 48px);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes drop { from { transform: translateY(-30px) scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
+.confetti { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; pointer-events: none; }
+
+.horse { position: absolute; left: 0; bottom: 4px; width: var(--hw); will-change: transform; }
+.horse::after { content: ""; position: absolute; left: 12%; right: 8%; bottom: -3px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, 0.22); filter: blur(2px); z-index: -1; }
+.horse svg { display: block; width: 100%; height: auto; overflow: visible; fill: currentColor; }
+.horse .shade { fill: rgba(0, 0, 0, 0.32); }
+.horse .hi { fill: rgba(255, 255, 255, 0.2); }
+.horse .blaze { fill: rgba(255, 255, 255, 0.5); }
+.horse .cloth { fill: rgba(255, 255, 255, 0.95); }
+.horse .num { font-family: var(--font-display); font-size: 9px; fill: #14161C; }
+.horse .eye { fill: #fff; }
+.horse .pupil { fill: #14161C; }
+.leg, .low, .tail { transform-box: view-box; }
+.leg path { fill: currentColor; stroke: currentColor; stroke-width: 1; stroke-linejoin: round; }
+.leg .hoof { fill: #2B2328; stroke: #2B2328; }
+.far { filter: brightness(0.7); }
+.running .leg { animation: swing 0.46s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.running .low { animation: knee 0.46s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.running .tail { animation: wave 0.24s ease-in-out infinite alternate; }
+@keyframes swing { 0% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } 100% { transform: rotate(-30deg); } }
+@keyframes knee { 0% { transform: rotate(2deg); } 50% { transform: rotate(55deg); } 100% { transform: rotate(2deg); } }
+@keyframes wave { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+.tag {
+  position: absolute;
+  left: 0;
+  top: calc(var(--lh) - 4px - var(--hw) * 0.3333 - var(--th) / 2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--th);
+  max-width: 100%;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22);
+  will-change: transform;
+}
+.tag.done { transition: transform 0.3s ease; }
+.tag.first { box-shadow: 0 0 0 2px #fff, 0 2px 0 2px rgba(0, 0, 0, 0.25); }
+.tag span { overflow: hidden; text-overflow: ellipsis; }
+.rk { margin-right: -4px; padding: 3px 6px; border-radius: 999px; background: rgba(0, 0, 0, 0.24); font-size: 11px; font-weight: 700; animation: pop 0.3s ease-out; }
+@keyframes pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
+
+.results { border-color: var(--res-line); background: linear-gradient(180deg, var(--card), var(--res-tint)); }
+.rhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.rhead h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1.2; }
+.state { flex: none; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.state.wait { background: var(--st-wait-bg); color: var(--st-wait-fg); }
+.state.run { background: var(--st-run-bg); color: var(--st-run-fg); }
+.state.done { background: var(--st-done-bg); color: var(--st-done-fg); }
+.resultlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.res {
+  display: grid;
+  grid-template-columns: auto 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--row-line);
+  border-radius: 18px;
+  background: var(--row-bg);
+  animation: rise 0.35s ease-out;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.res.r1 { padding-block: 18px; border-color: var(--gold-line); background: var(--gold-bg); box-shadow: 0 4px 0 rgba(242, 183, 31, 0.35); }
+.res.r2 { border-color: var(--silver-line); background: var(--silver-bg); }
+.res.r3 { border-color: var(--bronze-line); background: var(--bronze-bg); }
+.rankpill { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 999px; background: var(--medal-navy); color: #fff; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.r1 .rankpill { background: var(--medal-gold); color: var(--medal-gold-fg); }
+.r2 .rankpill { background: var(--medal-silver); }
+.r3 .rankpill { background: var(--medal-bronze); }
+.res .dot { box-shadow: 0 0 0 2px #fff; }
+.rname { font-family: var(--font-display); font-size: 19px; overflow-wrap: anywhere; }
+.r1 .rname { font-size: 22px; }
+.rtime { color: var(--muted); font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.empty { margin: 0; padding: 18px 16px; border: 1.5px dashed var(--pill-line); border-radius: 16px; color: var(--muted); font-size: 14px; text-align: center; }
+
+/* 경주 중 전체 화면 모드: LIVE 바 + 경주로가 화면을 꽉 채움 */
+.arena { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.arena.full {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  gap: 10px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(180deg, var(--sky-a), var(--sky-b));
+  animation: arenaIn 0.3s ease-out;
+}
+.arena.full .trackframe { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.arena.full .stage { flex: 1; min-height: 0; }
+.arena.full .lanes { height: 100%; display: flex; flex-direction: column; justify-content: center; }
+/* 4명 이하: 가로만 키우고 세로는 원래 높이 유지 (화면 세로 가운데 정렬) */
+.arena.full.wide { justify-content: center; }
+.arena.full.wide .trackframe, .arena.full.wide .stage { flex: none; }
+.arena.full.wide .lanes { height: auto; display: block; }
+
+/* 가로 화면에서는 8마리까지 한 화면에 들어오도록 경주장 구성요소를 압축 */
+.arena.full.wide.landscape {
+  justify-content: flex-start;
+  gap: 5px;
+}
+.arena.full.wide.landscape .live {
+  flex: none;
+  min-height: 0;
+  padding: 5px 9px;
+  gap: 7px;
+  border-width: 2px;
+  border-radius: 13px;
+}
+.arena.full.wide.landscape .livebadge {
+  padding: 3px 7px;
+  font-size: 10px;
+}
+.arena.full.wide.landscape .status {
+  font-size: 12px;
+  line-height: 1.15;
+}
+.arena.full.wide.landscape .clockpill {
+  min-width: 0;
+  padding: 3px 8px;
+  gap: 4px;
+  font-size: 12px;
+}
+.arena.full.wide.landscape .trackframe {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 4px 6px 5px;
+  border-width: 3px;
+  border-radius: 15px;
+}
+.arena.full.wide.landscape .thead {
+  flex: none;
+  padding: 0 3px 3px;
+  font-size: 10px;
+}
+.arena.full.wide.landscape .stage {
+  flex: 1;
+  min-height: 0;
+}
+.arena.full.wide.landscape .lanes {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1px 10px 1px 38px;
+}
+.arena.full.wide.landscape .lanes::before { left: 35px; width: 2px; }
+.arena.full.wide.landscape .lanes::after { width: 9px; background-size: 9px 9px; }
+.arena.full.wide.landscape .lane { height: var(--lh); }
+.arena.full.wide.landscape .numbadge {
+  left: -34px;
+  width: 25px;
+  height: 25px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+.arena.full.wide.landscape .horse { bottom: 1px; }
+.arena.full.wide.landscape .tag {
+  top: calc(var(--lh) - 1px - var(--hw) * 0.3333 - var(--th) / 2);
+  height: var(--th);
+  padding: 0 6px;
+  gap: 3px;
+  font-size: 10px;
+}
+.arena.full.wide.landscape .tfoot { padding-top: 3px; }
+/* 경주 종료 후 전체화면(가로) 동안에는 다시 시작 버튼을 숨김 (세로 복귀 후 다시 표시) */
+.arena.full .startbtn { display: none; }
+
+/* 세로 화면에서 시작하면 경주장을 시계방향 90도 돌려 가로 모드로 보여줌.
+   회전 전 기준 너비 = 화면 높이, 높이 = 화면 너비 (크기·위치는 JS가 지정) */
+.arena.full.rot {
+  inset: auto;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  transform: rotate(90deg);
+  animation: none;
+}
+
+/* 우승 카드 아래 2·3위 */
+.podium { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; }
+.podium li { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; color: var(--fg); font-size: 15px; font-weight: 700; }
+.podium .dot { width: 12px; height: 12px; }
+.podium .pn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arena.full.landscape .winner { gap: 4px; padding: 10px 22px 12px; }
+.arena.full.landscape .wlabel { font-size: 16px; }
+.arena.full.landscape .wname { font-size: 34px; }
+.arena.full.landscape .podium li { font-size: 13px; }
+@keyframes arenaIn { from { opacity: 0.4; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .arena.full { animation: none; }
+  .running .leg, .running .low, .running .tail { animation: none; }
+  .livebadge.on, .numbadge.bump, .countdown span, .winner { animation: none; }
+  .lanes { transition: none; }
+  .res, .rk { animation: none; }
+}
+</style>
+
+<main class="app">
+  <div class="stage-card">
+    <header class="hero">
+      <span class="badge" id="badge">🏇 스릴 만점 10초 레이스</span>
+      <h1>두근두근 경주마 순위 정하기</h1>
+      <p class="sub">참가자 이름을 입력하고 경주를 시작하세요! (최소 2명 ~ 최대 8명)</p>
+    </header>
+
+    <section class="card setup" aria-labelledby="setup-title">
+      <h2 id="setup-title">참가자 이름 입력 <span class="cnt" id="count">(0 / 8명)</span></h2>
+      <form id="addForm" autocomplete="off">
+        <label class="sr" for="nameInput">말 이름</label>
+        <input id="nameInput" type="text" maxlength="8" placeholder="이름을 입력하세요 (예: 홍길동)" enterkeyhint="done">
+        <div class="btnrow">
+          <button type="submit" id="addBtn" class="b3d blue">➕ 추가</button>
+          <button type="button" id="resetBtn" class="b3d grey">🔄 초기화</button>
+        </div>
+        <div class="dur" role="radiogroup" aria-labelledby="durLabel">
+          <span class="durlabel" id="durLabel">⏱️ 경주 시간:</span>
+          <div class="seg">
+            <label><input class="sr" type="radio" name="dur" value="10" checked><span>500m</span></label>
+            <label><input class="sr" type="radio" name="dur" value="15"><span>750m</span></label>
+            <label><input class="sr" type="radio" name="dur" value="20"><span>1,000m</span></label>
+          </div>
+        </div>
+      </form>
+      <p class="msg" id="msg" role="status"></p>
+      <div class="tools">
+        <button type="button" class="textbtn" id="soundBtn" aria-pressed="true">🔊 효과음 켜짐</button>
+        <button type="button" class="textbtn" id="sampleBtn">🐎 경주마 자동채우기</button>
+      </div>
+      <ul class="roster" id="roster"></ul>
+    </section>
+
+    <div class="arena-slot" id="arenaSlot"><div class="arena" id="arena">
+    <div class="live">
+      <span class="livebadge" id="liveBadge">LIVE</span>
+      <span class="status" id="status" role="status"><span class="sti" id="sti">⏳</span><span class="stt" id="stt">참가자를 기다리는 중</span></span>
+      
+    </div>
+
+    <section class="trackframe" aria-label="경주로">
+      <div class="thead"><span>🚩 출발선 (START)</span><span id="dist">500m</span><span>🏆 결승선 (FINISH)</span></div>
+      <div class="stage" id="stage">
+        <div class="lanes" id="lanes"></div>
+        <div class="cta" id="cta">
+          <div class="winner" id="winner" hidden>
+            <span class="wlabel">🏆 우승</span>
+            <b class="wname" id="wname"></b>
+            <ol class="podium" id="podium" aria-label="2위·3위"></ol>
+          </div>
+          <button type="button" id="startBtn" class="startbtn">🏁 시작</button>
+        </div>
+        <div class="countdown" id="countdown" role="status" aria-live="polite" hidden></div>
+        <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+      </div>
+      <div class="tfoot"><span class="clockpill">⏱️ <span id="clock">0.0초</span></span></div>
+    </section>
+    </div></div>
+
+    <section class="card results" aria-labelledby="res-title">
+      <div class="rhead">
+        <h2 id="res-title">🏆 실시간 순위표</h2>
+        <span class="state wait" id="resState">대기 중</span>
+      </div>
+      <ol class="resultlist" id="results" aria-live="polite"></ol>
+      <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  document.documentElement.lang = 'ko';
+
+  const MIN = 2, MAX = 8;
+  const PALETTE = ['#E53935', '#2F7DF0', '#18A957', '#F59E0B', '#8E44C9', '#E8579A', '#12B5C9', '#D4D91C'];
+  const MEDAL = ['🥇', '🥈', '🥉'];
+  const SAMPLES = ['적토', '번개', '질풍', '천둥', '태풍', '불꽃', '유성', '은하', '흑풍', '백운', '청룡', '비호'];
+
+  const $ = id => document.getElementById(id);
+  const form = $('addForm'), input = $('nameInput'), addBtn = $('addBtn'), resetBtn = $('resetBtn');
+  const sampleBtn = $('sampleBtn'), soundBtn = $('soundBtn'), startBtn = $('startBtn');
+  const badgeEl = $('badge'), msgEl = $('msg'), rosterEl = $('roster'), countEl = $('count');
+  const stageEl = $('stage'), lanesEl = $('lanes'), ctaEl = $('cta'), podiumEl = $('podium');
+  const liveEl = $('liveBadge'), statusEl = $('status'), clockEl = $('clock'), stateEl = $('resState');
+  const resultsEl = $('results'), emptyEl = $('resultEmpty'), cdEl = $('countdown');
+  const stiEl = $('sti'), sttEl = $('stt');
+  const winnerEl = $('winner'), wnameEl = $('wname'), confettiEl = $('confetti');
+  const arenaEl = $('arena'), slotEl = $('arenaSlot');
+
+  const durInputs = document.querySelectorAll('input[name="dur"]');
+  const getDur = () => { const c = document.querySelector('input[name="dur"]:checked'); return c ? Number(c.value) : 10; };
+
+  let players = [], racing = false, counting = false, hasRaced = false, nextId = 1;
+  let finished = [], pos = [], laneEls = [], horseEls = [], tagEls = [], tagW = [], badgeEls = [], finRank = [];
+  let laneW = 0, hw = 0, raf = 0, lastT = 0, doneAt = [];
+
+  /* 효과음 (WebAudio, 버튼을 누른 뒤에만 재생) */
+  let soundOn = true, ac = null, music = null;
+  const audio = () => {
+    if (!soundOn) return null;
+    try {
+      if (!ac) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ac = new C(); }
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    } catch (e) { return null; }
+  };
+  const tone = (f, d, type, vol, delay) => {
+    const a = audio(); if (!a) return;
+    try {
+      const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + (delay || 0);
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.1, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(a.destination);
+      o.start(t); o.stop(t + d + 0.03);
+    } catch (e) { /* 소리 재생 실패는 무시 */ }
+  };
+  /* 출발 총성: 날카로운 노이즈 폭발음 + 낮은 울림 + 짧은 메아리 */
+  const gunshot = () => {
+    const a = audio(); if (!a) return;
+    try {
+      const t = a.currentTime;
+      const len = Math.floor(a.sampleRate * 0.7);
+      const buf = a.createBuffer(1, len, a.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      const burst = (when, vol, filterType, freq) => {
+        const src = a.createBufferSource(); src.buffer = buf;
+        const f = a.createBiquadFilter(); f.type = filterType; f.frequency.value = freq;
+        const g = a.createGain();
+        g.gain.setValueAtTime(vol, t + when);
+        g.gain.exponentialRampToValueAtTime(0.001, t + when + 0.55);
+        src.connect(f); f.connect(g); g.connect(a.destination);
+        src.start(t + when);
+      };
+      burst(0, 0.55, 'highpass', 600);
+      burst(0.12, 0.16, 'lowpass', 1800);
+      const o = a.createOscillator(), og = a.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(190, t);
+      o.frequency.exponentialRampToValueAtTime(40, t + 0.2);
+      og.gain.setValueAtTime(0.6, t);
+      og.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+      o.connect(og); og.connect(a.destination);
+      o.start(t); o.stop(t + 0.26);
+    } catch (e) { /* 소리 재생 실패는 무시 */ }
+  };
+  /* 경주 배경 음악: 출발 총성 직후부터 마지막 말이 들어올 때까지 */
+  const musicStop = () => {
+    const m = music; music = null;
+    if (!m || !ac) return;
+    try {
+      const t = ac.currentTime;
+      m.gain.cancelScheduledValues(t);
+      m.gain.setValueAtTime(m.gain.value, t);
+      m.gain.linearRampToValueAtTime(0.0001, t + 0.25);
+      setTimeout(() => { try { m.disconnect(); } catch (e) { /* 이미 정리됨 */ } }, 500);
+    } catch (e) { /* 무시 */ }
+  };
+  const musicStart = dur => {
+    musicStop();
+    const a = audio(); if (!a) return;
+    try {
+      const out = a.createGain(); out.gain.value = 0.8; out.connect(a.destination);
+      music = out;
+      const t = a.currentTime + 0.35;
+      const note = (at, freq, len, type, vol) => {
+        const o = a.createOscillator(), g = a.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, at);
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(vol, at + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+        o.connect(g); g.connect(out); o.start(at); o.stop(at + len + 0.02);
+      };
+      const chords = [
+        { bass: 65.41, arp: [261.63, 329.63, 392, 523.25] },
+        { bass: 98, arp: [196, 246.94, 293.66, 392] },
+        { bass: 110, arp: [220, 261.63, 329.63, 440] },
+        { bass: 87.31, arp: [174.61, 220, 261.63, 349.23] }
+      ];
+      const eighth = 0.2, order = [0, 1, 2, 3, 2, 1, 2, 3];
+      for (let bar = 0; bar * 8 * eighth < dur; bar++) {
+        const ch = chords[bar % 4], t0 = t + bar * 8 * eighth;
+        order.forEach((ix, i) => {
+          const at = t0 + i * eighth;
+          if (at > t + dur) return;
+          note(at, ch.arp[ix] * 2, 0.16, 'square', 0.07);
+          if (i % 2 === 0) note(at, ch.bass, 0.3, 'triangle', 0.3);
+        });
+      }
+    } catch (e) { /* 소리 재생 실패는 무시 */ }
+  };
+  /* 축포: 짧게 터지는 폭죽 소리 */
+  const popSound = () => {
+    const a = audio(); if (!a) return;
+    try {
+      const t = a.currentTime;
+      const len = Math.floor(a.sampleRate * 0.3);
+      const buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+      const src = a.createBufferSource(); src.buffer = buf;
+      const f = a.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 900;
+      const g = a.createGain();
+      g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      src.connect(f); f.connect(g); g.connect(a.destination); src.start(t);
+      const o = a.createOscillator(), og = a.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(320, t); o.frequency.exponentialRampToValueAtTime(90, t + 0.12);
+      og.gain.setValueAtTime(0.35, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      o.connect(og); og.connect(a.destination); o.start(t); o.stop(t + 0.16);
+    } catch (e) { /* 소리 재생 실패는 무시 */ }
+  };
+  /* 우승 팡파레 "짜잔~": 솔-도-미 짧게, 도 장화음을 길게 + 북 + 심벌 */
+  const hz = n => 440 * Math.pow(2, (n - 69) / 12);
+  const brass = (a, midi, t, dur, vol, vib) => {
+    const out = a.createGain();
+    const f = a.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(700, t);
+    f.frequency.exponentialRampToValueAtTime(3200, t + 0.07);
+    f.frequency.exponentialRampToValueAtTime(1800, t + dur);
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vol, t + 0.04);
+    out.gain.setValueAtTime(vol, t + Math.max(0.05, dur - 0.12));
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.25);
+    f.connect(out); out.connect(a.destination);
+    [-7, 7].forEach(cents => {
+      const o = a.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(hz(midi), t);
+      o.detune.value = cents;
+      if (vib) {
+        const l = a.createOscillator(), lg = a.createGain();
+        l.frequency.value = 5.5; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(14, t + 0.5);
+        l.connect(lg); lg.connect(o.detune); l.start(t); l.stop(t + dur + 0.3);
+      }
+      o.connect(f); o.start(t); o.stop(t + dur + 0.3);
+    });
+  };
+  const fanfare = () => {
+    const a = audio(); if (!a) return;
+    try {
+      const t = a.currentTime + 0.05;
+      brass(a, 67, t, 0.12, 0.16);
+      brass(a, 72, t + 0.14, 0.12, 0.16);
+      brass(a, 76, t + 0.28, 0.12, 0.17);
+      const c = t + 0.46;
+      [60, 72, 76, 79, 84].forEach(n => brass(a, n, c, 1.5, 0.12, true));
+      brass(a, 48, c, 1.5, 0.14, true);
+      const o = a.createOscillator(), og = a.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(150, c); o.frequency.exponentialRampToValueAtTime(55, c + 0.25);
+      og.gain.setValueAtTime(0.6, c); og.gain.exponentialRampToValueAtTime(0.001, c + 0.45);
+      o.connect(og); og.connect(a.destination); o.start(c); o.stop(c + 0.5);
+      const len = Math.floor(a.sampleRate * 1.6);
+      const buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+      const src = a.createBufferSource(); src.buffer = buf;
+      const hp = a.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 5500;
+      const cg = a.createGain(); cg.gain.setValueAtTime(0.3, c); cg.gain.exponentialRampToValueAtTime(0.001, c + 1.5);
+      src.connect(hp); hp.connect(cg); cg.connect(a.destination); src.start(c);
+    } catch (e) { /* 소리 재생 실패는 무시 */ }
+  };
+  const sfx = {
+    add: () => tone(660, 0.09, 'triangle', 0.1),
+    tick: () => tone(880, 0.12, 'square', 0.06),
+    pop: () => popSound(),
+    start: () => gunshot(),
+    cross: rank => tone(Math.max(520, 1175 - (rank - 1) * 95), 0.16, 'triangle', 0.09),
+    end: () => fanfare()
+  };
+
+  /* 말 색상 위에서 읽히는 글자색 (WCAG 대비가 큰 쪽) */
+  const lin = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const textOn = hex => {
+    const n = parseInt(hex.slice(1), 16);
+    const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+    return 1.05 / (L + 0.05) >= (L + 0.05) / 0.06 ? '#FFFFFF' : '#17191F';
+  };
+
+  const shade = d => '<path d="' + d + '"/><path class="shade" d="' + d + '"/>';
+  const leg = (x, d) =>
+    '<g class="leg" style="--d:' + d + 's;transform-origin:' + x + 'px 36px">' +
+      '<path d="M' + (x - 2.6) + ' 36 L' + (x + 2.6) + ' 36 L' + (x + 2) + ' 47 L' + (x - 2) + ' 47 Z"/>' +
+      '<g class="low" style="transform-origin:' + x + 'px 47px">' +
+        '<path d="M' + (x - 2) + ' 47 L' + (x + 2) + ' 47 L' + (x + 1.5) + ' 58 L' + (x - 1.5) + ' 58 Z"/>' +
+        '<path class="hoof" d="M' + (x - 2.2) + ' 57.5 L' + (x + 2.2) + ' 57.5 L' + (x + 2.8) + ' 61 L' + (x - 2.8) + ' 61 Z"/>' +
+      '</g></g>';
+  const horseSVG = n =>
+    '<svg viewBox="0 0 96 64" aria-hidden="true" focusable="false">' +
+      '<g class="far">' + leg(34, 0) + leg(58, -0.23) + '</g>' +
+      '<g class="tail" style="transform-origin:21px 28px">' +
+        shade('M21 27 C12 23 5 28 4 38 C3 45 5 51 9 55 C9 47 11 41 17 37 C20 35 22 34 23 33 Z') + '</g>' +
+      '<path d="M20 30 C20 23 30 21 42 22 C52 23 58 24 62 27 C66 30 67 37 63 41 C58 46 50 46 44 45 C36 45 28 46 23 42 C19 38 19 34 20 30 Z"/>' +
+      '<path class="hi" d="M27 26 C35 23 48 23 58 26 C49 25 36 25 27 28 Z"/>' +
+      '<path class="shade" d="M24 41 C32 46 52 47 62 41 C57 48 33 49 24 41 Z"/>' +
+      '<path d="M56 25 C60 18 65 11 71 7 L79 12 C77 19 73 26 68 36 L62 38 Z"/>' +
+      '<path d="M70 8 C74 4 78 5 80 8 L89 20 C91 23 89 27 85 27 C82 27 80 25 78 23 L72 16 Z"/>' +
+      shade('M72 6 L74 0 L77 6 Z') +
+      shade('M71 6 C66 8 61 15 57 24 L60 27 C64 20 69 14 75 10 Z') +
+      shade('M75 5 L81 9 L77 12 Z') +
+      '<path class="blaze" d="M79 10 C82 13 85 17 87 21 L85 22 C83 18 80 14 77 12 Z"/>' +
+      '<circle class="eye" cx="77.8" cy="13" r="1.9"/><circle class="pupil" cx="78.2" cy="13.1" r="1"/><circle class="eye" cx="78.6" cy="12.6" r="0.35"/>' +
+      '<circle class="pupil" cx="87.6" cy="23.2" r="0.9"/>' +
+      '<rect class="cloth" x="37" y="24" width="13" height="12" rx="3"/>' +
+      '<text class="num" x="43.5" y="33.3" text-anchor="middle">' + n + '</text>' +
+      '<g>' + leg(28, -0.12) + leg(52, -0.35) + '</g>' +
+    '</svg>';
+
+  const setMsg = t => { msgEl.textContent = t || ''; };
+  const freeColor = () => {
+    const used = players.map(p => p.color);
+    return PALETTE.find(c => !used.includes(c)) || PALETTE[players.length % PALETTE.length];
+  };
+  const addPlayer = name => players.push({ id: nextId++, name, color: freeColor() });
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+  function renderRoster() {
+    rosterEl.textContent = '';
+    if (!players.length) {
+      const li = document.createElement('li'); li.className = 'roster-empty';
+      li.textContent = '아직 참가자가 없어요. 이름을 추가하거나 경주마 자동채우기를 눌러 보세요.';
+      rosterEl.appendChild(li);
+    }
+    players.forEach((p, i) => {
+      const li = document.createElement('li'); li.className = 'chip'; li.style.setProperty('--c', p.color);
+      const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = p.color;
+      const nm = document.createElement('span'); nm.className = 'cname'; nm.textContent = p.name;
+      const x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×';
+      x.setAttribute('aria-label', p.name + ' 삭제'); x.disabled = racing || counting;
+      x.addEventListener('click', () => removePlayer(p.id));
+      li.append(dot, nm, x);
+      rosterEl.appendChild(li);
+    });
+    countEl.textContent = '(' + players.length + ' / ' + MAX + '명)';
+  }
+
+  function updateHead() {
+    badgeEl.textContent = '🏇 스릴 만점 ' + getDur() + '초 레이스';
+    $('dist').textContent = (getDur() * 50).toLocaleString('en-US') + 'm';
+  }
+
+  function updateControls() {
+    const busy = racing || counting;
+    const full8 = players.length >= MAX;
+    input.disabled = busy || full8;
+    addBtn.disabled = busy || full8;
+    input.placeholder = full8 ? '참가자 ' + MAX + '명이 모두 찼어요' : '이름을 입력하세요 (예: 홍길동)';
+    resetBtn.disabled = busy;
+    sampleBtn.disabled = busy || full8;
+    durInputs.forEach(i => { i.disabled = busy; });
+    ctaEl.hidden = busy || players.length === 0;
+    stageEl.classList.toggle('idle', !busy && players.length > 0);
+    startBtn.disabled = busy || players.length < MIN;
+    const showWin = !busy && hasRaced && finished.length > 0;
+    stageEl.classList.toggle('done', showWin);
+    winnerEl.hidden = !showWin;
+    if (showWin) {
+      const w = finished[0];
+      wnameEl.textContent = w.name;
+      wnameEl.style.setProperty('--wc', w.color);
+      wnameEl.style.setProperty('--wt', textOn(w.color));
+      podiumEl.textContent = '';
+      finished.slice(1, 3).forEach((p, k) => {
+        const li = document.createElement('li');
+        const md = document.createElement('span'); md.textContent = MEDAL[k + 1];
+        const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = p.color;
+        const nm = document.createElement('span'); nm.className = 'pn'; nm.textContent = p.name;
+        li.append(md, dot, nm);
+        podiumEl.appendChild(li);
+      });
+      fitWinner();
+    }
+    startBtn.textContent = hasRaced ? '🏁 다시 시작' : '🏁 시작';
+  }
+
+  /* 이름이 길면 한 줄에 들어오도록 우승자 이름 글자 크기를 줄임 (화면 크기가 바뀔 때마다 다시 계산) */
+  function fitWinner() {
+    if (winnerEl.hidden) return;
+    wnameEl.style.fontSize = '';
+    let fs = parseFloat(getComputedStyle(wnameEl).fontSize) || 40;
+    while (wnameEl.scrollWidth > wnameEl.clientWidth && fs > 20) { fs -= 2; wnameEl.style.fontSize = fs + 'px'; }
+  }
+
+  /* 맨 앞 아이콘과 본문을 따로 두어, 줄이 바뀌어도 둘째 줄이 본문 첫 글자에 맞춰 정렬됨 */
+  function putStatus(str) {
+    const m = str.match(/^(\S+)\s+([\s\S]*)$/);
+    const icon = m ? m[1] : '', tx = m ? m[2] : str;
+    stiEl.textContent = icon; sttEl.textContent = tx; statusEl.title = tx;
+  }
+
+  function setStatus() {
+    let s, st, label;
+    if (counting) { s = '🎙️ 말들이 게이트에 들어섭니다!'; st = 'wait'; label = '대기 중'; }
+    else if (racing) { s = '🏇 경주 중! 누가 먼저 들어올까?'; st = 'run'; label = '진행 중'; }
+    else if (hasRaced && finished.length) {
+      const w = finished[0];
+      s = (midName && midName !== w.name) ? '🎊 짜릿한 역전승입니다! 우승 ' + w.name + '!' : '🏆 결승선 통과! 우승은 ' + w.name + '입니다!';
+      st = 'done'; label = '경주 완료';
+    }
+    else { s = players.length < MIN ? '⏳ 참가자를 기다리는 중' : '🚦 ' + players.length + '명 출전 대기'; st = 'wait'; label = '대기 중'; }
+    putStatus(s);
+    stateEl.textContent = label; stateEl.className = 'state ' + st;
+    liveEl.classList.toggle('on', racing);
+  }
+
+  function measure() {
+    const lane = lanesEl.querySelector('.lane');
+    if (!lane) { laneW = 0; hw = 0; return; }
+    laneW = lane.clientWidth;
+    hw = horseEls[0].offsetWidth;
+    tagW = tagEls.map(t => t.offsetWidth);
+  }
+
+  function applyPos(t) {
+    for (let i = 0; i < horseEls.length; i++) {
+      const x = pos[i] * (laneW - hw);
+      let amp = 1.3;
+      if (doneAt[i] != null) amp *= Math.max(0, 1 - (t - doneAt[i]) / 0.5);
+      const bob = racing && laneEls[i].classList.contains('running') ? Math.sin(t * 22 + i * 1.7) * amp : 0;
+      horseEls[i].style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + bob.toFixed(2) + 'px,0)';
+      /* 이름표는 말 몸통 위가 아니라 꼬리 쪽(진행 방향 뒤)에 배치합니다.
+         출발 직후에는 뒤쪽 공간이 부족하므로 반대편으로 잠시 피하고,
+         공간이 생기면 다시 꼬리 쪽으로 이동합니다. */
+      const gap = Math.max(6, Math.round(hw * 0.08));
+      const behindX = x - tagW[i] - gap;
+      const aheadX = x + hw + gap;
+      const tx = behindX >= 0
+        ? behindX
+        : clamp(aheadX, 0, Math.max(0, laneW - tagW[i]));
+      tagEls[i].style.transform = 'translate3d(' + tx.toFixed(1) + 'px,0,0)';
+    }
+  }
+
+  function buildLanes() {
+    lanesEl.textContent = '';
+    laneEls = []; horseEls = []; tagEls = []; badgeEls = []; finRank = [];
+    if (players.length === 0) {
+      const e = document.createElement('div'); e.className = 'lanes-empty';
+      e.textContent = '참가자를 추가하면 출발선에 말이 섭니다.';
+      lanesEl.appendChild(e);
+      pos = []; doneAt = []; laneW = 0; hw = 0;
+      return;
+    }
+    players.forEach((p, i) => {
+      const lane = document.createElement('div'); lane.className = 'lane';
+      const badge = document.createElement('span'); badge.className = 'numbadge';
+      badge.style.background = p.color; badge.style.color = textOn(p.color); badge.textContent = i + 1;
+      const tag = document.createElement('div'); tag.className = 'tag';
+      tag.style.background = p.color; tag.style.color = textOn(p.color);
+      const nm = document.createElement('span'); nm.textContent = p.name; tag.appendChild(nm);
+      const rkEl = document.createElement('b'); rkEl.className = 'rk'; rkEl.textContent = '1위'; tag.appendChild(rkEl);
+      const horse = document.createElement('div'); horse.className = 'horse'; horse.style.color = p.color;
+      horse.innerHTML = horseSVG(i + 1);
+      lane.append(badge, tag, horse);
+      lanesEl.appendChild(lane);
+      laneEls.push(lane); horseEls.push(horse); tagEls.push(tag); badgeEls.push(badge);
+    });
+    pos = players.map(() => 0);
+    doneAt = players.map(() => null);
+    finRank = players.map(() => null);
+    measure();
+    applyPos(0);
+  }
+
+  /* 전체 화면 모드: 시작하면 LIVE+경주로를 화면 가득, 끝나면 원래 크기 */
+  let isFull = false;
+  let celebTimer = 0;
+  /* 세로 화면이면 경주장을 시계방향 90도 회전해 가로 모드처럼 보여줌.
+     폰을 실제로 가로로 돌리면 회전을 풀고 그대로 가로 화면을 사용 */
+  function fitRot() {
+    if (!isFull) return;
+    const W = window.innerWidth, H = window.innerHeight;
+    const rot = H > W;
+    arenaEl.classList.toggle('rot', rot);
+    if (rot) {
+      arenaEl.style.width = H + 'px';
+      arenaEl.style.height = W + 'px';
+      arenaEl.style.left = W + 'px';
+    } else {
+      ['width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
+    }
+    /* 회전했거나 실제 가로 화면이면 가로용 압축 배치 사용 */
+    const landscape = rot || W > H;
+    arenaEl.classList.toggle('landscape', landscape);
+    arenaEl.classList.toggle('wide', landscape || players.length <= 4);
+  }
+  function fitLanes() {
+    if (!isFull || !players.length) return;
+    const landscape = arenaEl.classList.contains('landscape');
+    if (landscape) {
+      /* 참가 인원에 따라 레인 높이를 재계산합니다.
+         적은 인원은 말을 크게, 8명은 화면 안에 모두 들어오도록 자동 축소합니다. */
+      const available = Math.max(160, stageEl.clientHeight - 8);
+      const lh = clamp(Math.floor(available / players.length), 22, 104);
+      arenaEl.style.setProperty('--lh', lh + 'px');
+      arenaEl.style.setProperty('--hw', clamp(lh * 1.18, 26, 116) + 'px');
+      arenaEl.style.setProperty('--th', clamp(lh * 0.56, 13, 30) + 'px');
+      return;
+    }
+    /* 세로 화면에서도 참가 인원에 맞춰 말 크기를 자동 조절합니다. */
+    const inner = Math.max(180, stageEl.clientHeight - 12);
+    const lh = clamp(Math.floor(inner / players.length), 48, 170);
+    arenaEl.style.setProperty('--lh', lh + 'px');
+    arenaEl.style.setProperty('--hw', clamp(lh * 1.08, 48, 184) + 'px');
+    arenaEl.style.setProperty('--th', clamp(lh * 0.24, 22, 30) + 'px');
+  }
+  function enterFull() {
+    if (isFull) return;
+    slotEl.style.height = arenaEl.offsetHeight + 'px';
+    isFull = true;
+    arenaEl.classList.add('full');
+    /* 회전된 요소는 전체화면 대상이 될 수 없으므로 문서 전체를 전체화면으로 (막히면 화면 가득 채우기만 적용) */
+    try {
+      const de = document.documentElement;
+      if (de.requestFullscreen) de.requestFullscreen().catch(() => {});
+    } catch (e) { /* 전체화면 API 미지원 */ }
+    fitRot();
+    fitLanes();
+  }
+  function exitFull() {
+    if (!isFull) return;
+    isFull = false;
+    clearTimeout(celebTimer);
+    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot');
+    ['--lh', '--hw', '--th', 'width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
+    slotEl.style.height = '';
+    /* 줄어든 경주장 박스를 브라우저 화면 세로 중간에 맞춤 (전체화면 해제가 끝난 뒤 한 번 더) */
+    const center = () => { try { arenaEl.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) { /* 무시 */ } };
+    requestAnimationFrame(() => { fitWinner(); center(); });
+    setTimeout(() => { fitWinner(); measure(); applyPos(lastT); center(); }, 300);
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* 무시 */ }
+  }
+
+  /* 경마장 아나운서 멘트: 선두 진행도와 선두 교체에 맞춰 LIVE 바에 표시 */
+  let cm = { text: '', t: -9, phase: -1, lead: -1, k: 0 }, midName = null;
+  const iga = n => { const c = n.charCodeAt(n.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0) ? '이' : '가'; };
+  const LINES = [
+    [() => '출발했습니다! 일제히 박차고 나갑니다!', n => n + ', 좋은 스타트로 앞서 나갑니다!'],
+    [n => n + iga(n) + ' 선두, 그 뒤를 바짝 쫓고 있습니다!', () => '안쪽에서 치고 올라옵니다!'],
+    [() => '마지막 직선 코스! 승부가 갈립니다!', n => n + iga(n) + ' 선두, 그 뒤를 바짝 쫓고 있습니다!'],
+    [() => '결승선이 코앞입니다! 누가 먼저 들어올까요!', () => '마지막 직선 코스! 승부가 갈립니다!']
+  ];
+  function commentary(t) {
+    if (!players.length) return;
+    let lead = 0;
+    const fin = finRank.map((r, i) => r != null ? i : -1).filter(i => i >= 0).sort((a, b) => finRank[a] - finRank[b]);
+    if (fin.length) lead = fin[0];
+    else for (let i = 1; i < pos.length; i++) if (pos[i] > pos[lead]) lead = i;
+    const u = pos[lead];
+    const phase = u < 0.15 ? 0 : u < 0.6 ? 1 : u < 0.85 ? 2 : 3;
+    const n = players[lead].name;
+    if (phase >= 2 && midName === null) midName = n;
+    const changed = cm.lead >= 0 && lead !== cm.lead && u > 0.15 && u < 0.95;
+    let text = null;
+    if (changed) {
+      if (t - cm.t >= 0.8) text = phase >= 2 ? n + ', 막판 스퍼트! 선두가 바뀝니다!' : '순위가 뒤집힙니다! 아직 아무도 몰라요!';
+    } else if (phase !== cm.phase || t - cm.t >= 1.8) {
+      const L = LINES[phase]; text = L[cm.k++ % L.length](n);
+    }
+    cm.lead = lead; cm.phase = phase;
+    if (text && text !== cm.text) {
+      cm.text = text; cm.t = t;
+      putStatus('🎙️ ' + text);
+    }
+  }
+
+  function resetRace() {
+    cancelAnimationFrame(raf);
+    clearTimeout(celebTimer);
+    musicStop();
+    stopConfetti();
+    racing = false; hasRaced = false; finished = []; lastT = 0;
+    resultsEl.textContent = '';
+    emptyEl.hidden = false;
+    clockEl.textContent = '0.0초';
+    buildLanes();
+    updateControls();
+    setStatus();
+  }
+
+  function addResult(rank, p, time) {
+    const li = document.createElement('li'); li.className = 'res r' + Math.min(rank, 4);
+    const rk = document.createElement('span'); rk.className = 'rankpill';
+    rk.textContent = (MEDAL[rank - 1] ? MEDAL[rank - 1] + ' ' : '') + rank + '위';
+    const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = p.color;
+    const nm = document.createElement('span'); nm.className = 'rname'; nm.textContent = p.name;
+    const tm = document.createElement('span'); tm.className = 'rtime'; tm.textContent = time.toFixed(2) + '초';
+    li.append(rk, dot, nm, tm);
+    resultsEl.appendChild(li);
+    emptyEl.hidden = true;
+  }
+
+  function finishHorse(i, T) {
+    const rank = finished.length + 1;
+    finished.push({ name: players[i].name, color: players[i].color, time: T });
+    doneAt[i] = lastT;
+    finRank[i] = rank;
+    try { horseEls[i].getAnimations({ subtree: true }).forEach(a => { a.playbackRate = 0.35; }); } catch (e) { /* 미지원 브라우저는 그대로 */ }
+    tagEls[i].classList.add('done');
+    if (rank === 1) tagEls[i].classList.add('first');
+    tagW[i] = tagEls[i].offsetWidth;
+    addResult(rank, players[i], T);
+    sfx.cross(rank);
+  }
+
+  /* 경주가 끝나면 다리 움직임을 서서히 늦춰 멈춤 */
+  function settleLegs() {
+    let anims = [];
+    try { anims = horseEls.flatMap(h => h.getAnimations({ subtree: true })); } catch (e) { return; }
+    let r = 0.35;
+    const slow = () => {
+      r *= 0.9;
+      if (r > 0.02) { anims.forEach(a => { a.playbackRate = r; }); requestAnimationFrame(slow); }
+      else anims.forEach(a => a.pause());
+    };
+    slow();
+  }
+
+  /* 말 뒤쪽 번호판: 경주 중에는 현재 순위, 결승선을 지난 말은 확정 순위 */
+  function updateRanks() {
+    /* 동률이면 같은 순위: 출발 전 카운트다운 동안에는 모든 말이 1위 */
+    const finCount = finRank.filter(r => r != null).length;
+    const rankOf = i => finRank[i] != null
+      ? finRank[i]
+      : finCount + 1 + pos.filter((v, j) => finRank[j] == null && v > pos[i]).length;
+    pos.forEach((_, i) => {
+      const r = rankOf(i), t = String(r);
+      const el = badgeEls[i];
+      if (el && el.textContent !== t) {
+        el.textContent = t;
+        el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+      }
+      const rk = tagEls[i] && tagEls[i].querySelector('.rk');
+      if (rk && rk.textContent !== t + '위') { rk.textContent = t + '위'; tagW[i] = tagEls[i].offsetWidth; }
+    });
+  }
+
+  function runRace() {
+    if (racing || players.length < MIN) return;
+    setMsg('');
+    finished = [];
+    resultsEl.textContent = '';
+    emptyEl.hidden = false;
+    buildLanes();
+    sfx.start();
+
+    const n = players.length;
+    const order = shuffle([...Array(n).keys()]);
+    const step = Math.min(0.17, 1.2 / n);
+    const k = getDur() / 10;
+    const race = players.map((p, i) => ({
+      T: (9.6 + order[i] * step + Math.random() * step * 0.35) * k,
+      waves: [
+        { a: 0.035, f: 1 + Math.random(), ph: Math.random() * 6.283 },
+        { a: 0.020, f: 2 + Math.random(), ph: Math.random() * 6.283 },
+        { a: 0.010, f: 3 + Math.random(), ph: Math.random() * 6.283 }
+      ],
+      last: 0, done: false
+    }));
+    const maxT = Math.max(...race.map(r => r.T));
+    musicStart(maxT + 1);
+
+    cm = { text: '', t: -9, phase: -1, lead: -1, k: 0 }; midName = null;
+    racing = true; hasRaced = true;
+    renderRoster(); updateControls(); setStatus();
+    laneEls.forEach(l => l.classList.add('running'));
+
+    const t0 = performance.now();
+    const frame = now => {
+      const t = Math.max(0, (now - t0) / 1000);
+      lastT = t;
+      const just = [];
+      race.forEach((r, i) => {
+        const u = Math.min(t / r.T, 1);
+        let p = 1;
+        if (u < 1) {
+          let w = 0;
+          r.waves.forEach(wv => { w += wv.a * Math.sin(2 * Math.PI * wv.f * u + wv.ph); });
+          p = Math.min(0.999, Math.max(r.last, u + Math.sin(Math.PI * u) * w));
+        } else if (!r.done) {
+          r.done = true; just.push(i);
+        }
+        r.last = p; pos[i] = p;
+      });
+      just.sort((a, b) => race[a].T - race[b].T).forEach(i => finishHorse(i, race[i].T));
+      updateRanks();
+      commentary(t);
+      applyPos(t);
+      clockEl.textContent = Math.min(t, maxT).toFixed(1) + '초';
+
+      if (finished.length === n && t > maxT + 0.5) {
+        racing = false;
+        clockEl.textContent = maxT.toFixed(1) + '초';
+        renderRoster(); updateControls(); setStatus();
+        measure(); applyPos(lastT);
+        settleLegs();
+        musicStop();
+        /* 결승 후 폭죽이 끝날 때까지 가로 전체화면을 유지한 뒤 원래 세로 방향으로 복귀 */
+        setTimeout(() => { sfx.end(); fireConfetti(); }, 150);
+        celebTimer = setTimeout(() => exitFull(), 3150); /* 폭죽(150ms 후 발사) 뒤 3초 대기 */
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+  }
+
+  /* 축포: 경주로 양쪽 아래에서 색종이가 터져 올라감 (3번 연속) */
+  let confRaf = 0, confTimers = [];
+  function stopConfetti() {
+    cancelAnimationFrame(confRaf); confRaf = 0;
+    confTimers.forEach(clearTimeout); confTimers = [];
+    const c = confettiEl.getContext('2d');
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, confettiEl.width, confettiEl.height);
+  }
+  function fireConfetti() {
+    stopConfetti();
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const W = stageEl.clientWidth, H = stageEl.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (!W || !H) return;
+    confettiEl.width = Math.round(W * dpr); confettiEl.height = Math.round(H * dpr);
+    const c = confettiEl.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const COLORS = ['#FF4D4D', '#FFC62F', '#2F7DF0', '#18A957', '#E8579A', '#8E44C9', '#12B5C9', '#FFFFFF'];
+    const G = 900, v0 = Math.sqrt(2 * G * H * 0.95), parts = [];
+    const shoot = (x, ang, n) => {
+      for (let i = 0; i < n; i++) {
+        const a = ang + (Math.random() - 0.5) * 0.8, s = v0 * (0.5 + Math.random() * 0.55);
+        parts.push({
+          x, y: H, vx: Math.cos(a) * s * 0.7, vy: Math.sin(a) * s,
+          w: 6 + Math.random() * 6, h: 4 + Math.random() * 6,
+          rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 12,
+          c: COLORS[Math.floor(Math.random() * COLORS.length)],
+          age: 0, max: 2.4 + Math.random() * 1.2
+        });
+      }
+    };
+    [0, 0.45, 0.9].forEach(dt => confTimers.push(setTimeout(() => {
+      shoot(8, -Math.PI / 3, 55);
+      shoot(W - 8, -2 * Math.PI / 3, 55);
+      if (dt > 0) sfx.pop();
+    }, dt * 1000)));
+    const t0 = performance.now();
+    let last = t0;
+    const step = now => {
+      const dt = Math.min(0.04, (now - last) / 1000); last = now;
+      c.clearRect(0, 0, W, H);
+      let alive = 0;
+      parts.forEach(p => {
+        p.age += dt;
+        if (p.age >= p.max) return;
+        alive++;
+        p.vy += G * dt; p.vx *= 0.992; p.vy *= 0.992;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+        const hh = p.h * Math.abs(Math.cos(p.rot * 1.7)) + 1;
+        c.save();
+        c.globalAlpha = Math.min(1, (p.max - p.age) / 0.5);
+        c.translate(p.x, p.y); c.rotate(p.rot);
+        c.fillStyle = p.c;
+        c.fillRect(-p.w / 2, -hh / 2, p.w, hh);
+        c.restore();
+      });
+      if (alive || now - t0 < 1300) confRaf = requestAnimationFrame(step); else stopConfetti();
+    };
+    confRaf = requestAnimationFrame(step);
+  }
+
+  /* 시작 버튼 자리에 3, 2, 1, 출발 순서로 카운트다운을 보여주고 출발과 함께 총성 */
+  function showCount(txt, go) {
+    cdEl.textContent = '';
+    const s = document.createElement('span');
+    if (go) s.className = 'go';
+    s.textContent = txt;
+    cdEl.appendChild(s);
+    cdEl.hidden = false;
+  }
+  function hideCount() { cdEl.hidden = true; cdEl.textContent = ''; }
+
+  function beginCountdown() {
+    if (racing || counting || players.length < MIN) return;
+    setMsg('');
+    finished = [];
+    resultsEl.textContent = '';
+    emptyEl.hidden = false;
+    clockEl.textContent = '0.0초';
+    stopConfetti();
+    enterFull();
+    buildLanes();
+    updateRanks();
+    counting = true;
+    updateControls(); setStatus();
+    const tick = n => {
+      showCount(String(n)); sfx.tick();
+      if (n === 1) { putStatus('🎙️ 숨 막히는 정적, 곧 출발합니다!'); }
+    };
+    tick(3);
+    setTimeout(() => tick(2), 1000);
+    setTimeout(() => tick(1), 2000);
+    setTimeout(() => {
+      counting = false;
+      showCount('출발', true);
+      runRace();
+      setTimeout(hideCount, 900);
+    }, 3000);
+  }
+
+  function removePlayer(id) {
+    if (racing || counting) return;
+    players = players.filter(p => p.id !== id);
+    setMsg('');
+    renderRoster(); resetRace();
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (racing || counting) return;
+    const name = input.value.trim().replace(/\s+/g, ' ');
+    if (!name) { setMsg('이름을 입력해 주세요.'); input.focus(); return; }
+    if (players.length >= MAX) { setMsg('최대 ' + MAX + '명까지 참가할 수 있어요.'); input.focus(); return; }
+    if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) { setMsg('이미 있는 이름이에요.'); input.focus(); return; }
+    setMsg('');
+    addPlayer(name);
+    sfx.add();
+    input.value = '';
+    renderRoster(); resetRace();
+    if (!input.disabled) input.focus();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (racing || counting) return;
+    players = []; nextId = 1; setMsg('');
+    input.value = '';
+    renderRoster(); resetRace();
+    input.focus();
+  });
+
+  /* 경주마 자동채우기: 누를 때마다 두 글자 경주마 이름을 무작위로 한 명씩 추가, 8명이면 비활성화 */
+  sampleBtn.addEventListener('click', () => {
+    if (racing || counting || players.length >= MAX) return;
+    const free = SAMPLES.filter(n => !players.some(p => p.name === n));
+    if (!free.length) return;
+    setMsg('');
+    addPlayer(free[Math.floor(Math.random() * free.length)]);
+    sfx.add();
+    renderRoster(); resetRace();
+  });
+
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.textContent = soundOn ? '🔊 효과음 켜짐' : '🔇 효과음 꺼짐';
+    if (soundOn) sfx.add(); else musicStop();
+  });
+
+  durInputs.forEach(i => i.addEventListener('change', () => { updateHead(); updateControls(); }));
+  startBtn.addEventListener('click', beginCountdown);
+
+  const remeasure = () => {
+    fitRot(); fitLanes(); measure(); applyPos(lastT); fitWinner();
+  };
+  if (window.ResizeObserver) { const ro = new ResizeObserver(remeasure); ro.observe(lanesEl); ro.observe(stageEl); }
+  window.addEventListener('resize', remeasure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); applyPos(lastT); });
+
+  updateHead();
+  renderRoster();
+  resetRace();
+})();
+</script>
+
+</body></html>
