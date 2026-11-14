@@ -470,30 +470,52 @@ input[type="text"]:disabled { opacity: 0.55; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  max-width: 100%;
-  padding: 15px 27px 18px;
+  gap: 8px;
+  width: min(100%, 340px);
+  padding: 12px 8px 0;
   border: 4px solid #F2B71F;
-  border-radius: 33px;
+  border-radius: 28px;
   background: var(--card);
   box-shadow: 0 12px 27px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
   animation: drop 0.55s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
-.wlabel { color: var(--muted); font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
-.wname {
+.wlabel { color: var(--muted); font-size: 16px; font-weight: 700; letter-spacing: 0.04em; }
+/* 시상대: 가운데 1위(가장 높음), 왼쪽 2위, 오른쪽 3위. 단 위에 말 색 이름표 */
+.podium { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: 1fr 1.25fr 1fr; align-items: end; gap: 6px; }
+.podium.two { grid-template-columns: 1fr 1.25fr; }
+.podium li { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.podium .p1 { order: 2; }
+.podium .p2 { order: 1; }
+.podium .p3 { order: 3; }
+.pname {
   max-width: 100%;
-  padding: 3px 27px 6px;
+  padding: 2px 6px 4px;
   border-radius: 999px;
-  background: var(--wc, var(--green));
-  color: var(--wt, #fff);
+  background: var(--pc, var(--green));
+  color: var(--pt, #fff);
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(36px, 10.5vw, 48px);
+  font-size: 17px;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.p1 .pname { padding: 2px 12px 5px; font-size: 26px; }
+.pstep {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 10px 10px 0 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.p1 .pstep { height: 64px; background: var(--medal-gold); color: var(--medal-gold-fg); font-size: 20px; }
+.p2 .pstep { height: 44px; background: var(--medal-silver); }
+.p3 .pstep { height: 30px; background: var(--medal-bronze); }
 @keyframes drop { from { transform: translateY(-30px) scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
 .confetti { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; pointer-events: none; }
 
@@ -678,15 +700,13 @@ input[type="text"]:disabled { opacity: 0.55; }
   animation: none;
 }
 
-/* 우승 카드 아래 2·3위 */
-.podium { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; }
-.podium li { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; color: var(--fg); font-size: 15px; font-weight: 700; }
-.podium .dot { width: 12px; height: 12px; }
-.podium .pn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.arena.full.landscape .winner { gap: 4px; padding: 10px 22px 12px; }
-.arena.full.landscape .wlabel { font-size: 16px; }
-.arena.full.landscape .wname { font-size: 34px; }
-.arena.full.landscape .podium li { font-size: 13px; }
+/* 가로 전체화면에서는 시상대를 조금 낮춤 */
+.arena.full.landscape .winner { gap: 6px; width: min(100%, 440px); padding-top: 9px; }
+.arena.full.landscape .wlabel { font-size: 14px; }
+.arena.full.landscape .p1 .pstep { height: 52px; }
+.arena.full.landscape .p2 .pstep { height: 36px; }
+.arena.full.landscape .p3 .pstep { height: 24px; }
+
 @keyframes arenaIn { from { opacity: 0.4; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -745,9 +765,8 @@ input[type="text"]:disabled { opacity: 0.55; }
         <div class="lanes" id="lanes"></div>
         <div class="cta" id="cta">
           <div class="winner" id="winner" hidden>
-            <span class="wlabel">🏆 우승</span>
-            <b class="wname" id="wname"></b>
-            <ol class="podium" id="podium" aria-label="2위·3위"></ol>
+            <span class="wlabel">🏆 경주 결과</span>
+            <ol class="podium" id="podium" aria-label="1위부터 3위까지"></ol>
           </div>
           <button type="button" id="startBtn" class="startbtn">🏁 시작</button>
         </div>
@@ -786,7 +805,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   const liveEl = $('liveBadge'), statusEl = $('status'), clockEl = $('clock'), stateEl = $('resState');
   const resultsEl = $('results'), emptyEl = $('resultEmpty'), cdEl = $('countdown');
   const stiEl = $('sti'), sttEl = $('stt');
-  const winnerEl = $('winner'), wnameEl = $('wname'), confettiEl = $('confetti');
+  const winnerEl = $('winner'), confettiEl = $('confetti');
   const arenaEl = $('arena'), slotEl = $('arenaSlot');
 
   const durInputs = document.querySelectorAll('input[name="dur"]');
@@ -1059,17 +1078,15 @@ input[type="text"]:disabled { opacity: 0.55; }
     stageEl.classList.toggle('done', showWin);
     winnerEl.hidden = !showWin;
     if (showWin) {
-      const w = finished[0];
-      wnameEl.textContent = w.name;
-      wnameEl.style.setProperty('--wc', w.color);
-      wnameEl.style.setProperty('--wt', textOn(w.color));
       podiumEl.textContent = '';
-      finished.slice(1, 3).forEach((p, k) => {
-        const li = document.createElement('li');
-        const md = document.createElement('span'); md.textContent = MEDAL[k + 1];
-        const dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = p.color;
-        const nm = document.createElement('span'); nm.className = 'pn'; nm.textContent = p.name;
-        li.append(md, dot, nm);
+      const top = finished.slice(0, 3);
+      podiumEl.classList.toggle('two', top.length === 2);
+      top.forEach((p, k) => {
+        const li = document.createElement('li'); li.className = 'p' + (k + 1);
+        const nm = document.createElement('b'); nm.className = 'pname'; nm.textContent = p.name;
+        nm.style.setProperty('--pc', p.color); nm.style.setProperty('--pt', textOn(p.color));
+        const st = document.createElement('span'); st.className = 'pstep'; st.textContent = MEDAL[k] + ' ' + (k + 1) + '위';
+        li.append(nm, st);
         podiumEl.appendChild(li);
       });
       fitWinner();
@@ -1077,12 +1094,14 @@ input[type="text"]:disabled { opacity: 0.55; }
     startBtn.textContent = hasRaced ? '🏁 다시 시작' : '🏁 시작';
   }
 
-  /* 이름이 길면 한 줄에 들어오도록 우승자 이름 글자 크기를 줄임 (화면 크기가 바뀔 때마다 다시 계산) */
+  /* 이름이 길면 시상대 칸 안에 한 줄로 들어오도록 글자 크기를 줄임 (화면 크기가 바뀔 때마다 다시 계산) */
   function fitWinner() {
     if (winnerEl.hidden) return;
-    wnameEl.style.fontSize = '';
-    let fs = parseFloat(getComputedStyle(wnameEl).fontSize) || 40;
-    while (wnameEl.scrollWidth > wnameEl.clientWidth && fs > 20) { fs -= 2; wnameEl.style.fontSize = fs + 'px'; }
+    podiumEl.querySelectorAll('.pname').forEach(el => {
+      el.style.fontSize = '';
+      let fs = parseFloat(getComputedStyle(el).fontSize) || 17;
+      while (el.scrollWidth > el.clientWidth && fs > 9) { fs -= 1; el.style.fontSize = fs + 'px'; }
+    });
   }
 
   /* 맨 앞 아이콘과 본문을 따로 두어, 줄이 바뀌어도 둘째 줄이 본문 첫 글자에 맞춰 정렬됨 */
