@@ -321,8 +321,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   font-weight: 700;
   cursor: pointer;
 }
-.textbtn#sampleBtn { flex: 1.5 1 0; }
-#soundBtn { flex: 1 1 0; }
+.textbtn#sampleBtn, #soundBtn { flex: 1 1 0; }
 .textbtn:active:not(:disabled) { transform: translateY(1px); }
 .textbtn:disabled { opacity: 0.45; cursor: not-allowed; }
 /* 효과음: 켜짐은 노란색, 꺼짐은 옅은 회색 */
@@ -750,7 +749,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="msg" id="msg" role="status"></p>
       <div class="tools">
         <button type="button" class="textbtn" id="soundBtn" aria-pressed="true">🔊 효과음 켜짐</button>
-        <button type="button" class="textbtn" id="sampleBtn">🐎 경주마 자동채우기</button>
+        <button type="button" class="textbtn" id="sampleBtn">🐎 경주마 추가</button>
       </div>
       <ul class="roster" id="roster"></ul>
     </section>
@@ -1043,7 +1042,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     rosterEl.textContent = '';
     if (!players.length) {
       const li = document.createElement('li'); li.className = 'roster-empty';
-      li.textContent = '아직 참가자가 없어요. 이름을 추가하거나 경주마 자동채우기를 눌러 보세요.';
+      li.textContent = '아직 참가자가 없어요. 이름을 추가하거나 경주마 추가를 눌러 보세요.';
       rosterEl.appendChild(li);
     }
     players.forEach((p, i) => {
@@ -1563,7 +1562,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     input.focus();
   });
 
-  /* 경주마 자동채우기: 누를 때마다 두 글자 경주마 이름을 무작위로 한 명씩 추가, 8명이면 비활성화 */
+  /* 경주마 추가: 누를 때마다 두 글자 경주마 이름을 무작위로 한 명씩 추가, 8명이면 비활성화 */
   sampleBtn.addEventListener('click', () => {
     if (racing || counting || players.length >= MAX) return;
     const free = SAMPLES.filter(n => !players.some(p => p.name === n));
