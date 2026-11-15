@@ -1521,11 +1521,12 @@ input[type="text"]:disabled { opacity: 0.55; }
       updateRanks();
       commentary(t);
       applyPos(t);
-      clockEl.textContent = Math.min(t, maxT).toFixed(1) + '초';
+      /* 1위가 결승선을 통과하면 초시계를 1위 기록에서 멈춤 (순위표와 같은 소수 둘째 자리) */
+      clockEl.textContent = finished.length ? finished[0].time.toFixed(2) + '초' : t.toFixed(1) + '초';
 
       if (finished.length === n && t > maxT + 0.5) {
         racing = false;
-        clockEl.textContent = maxT.toFixed(1) + '초';
+        clockEl.textContent = finished[0].time.toFixed(2) + '초';
         renderRoster(); updateControls(); setStatus();
         measure(); applyPos(lastT);
         settleLegs();
