@@ -782,7 +782,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <h2 id="setup-title">참가자 이름 입력 <span class="cnt" id="count">(0 / 8명)</span></h2>
       <form id="addForm" autocomplete="off">
         <label class="sr" for="nameInput">말 이름</label>
-        <input id="nameInput" type="text" maxlength="8" placeholder="이름을 입력하세요 (예: 홍길동)" enterkeyhint="done">
+        <input id="nameInput" type="text" maxlength="6" placeholder="이름을 입력하세요 (예: 홍길동)" enterkeyhint="done">
         <div class="btnrow">
           <button type="button" id="addBtn" class="b3d blue">➕ 추가</button>
           <button type="button" id="resetBtn" class="b3d grey">🔄 초기화</button>
@@ -1651,9 +1651,37 @@ input[type="text"]:disabled { opacity: 0.55; }
   /* 이름 추가. 클로드 미리보기 같은 샌드박스 화면에서는 form 제출(submit)이 막혀 있어서
      추가 버튼 클릭과 Enter 키를 직접 처리합니다. */
   let lastAddAt = 0, pendingEnter = false;
+
+  /* 이름 길이 제한: 한글은 3글자, 알파벳(숫자·기호 포함)은 6글자까지.
+     한글 1글자 = 2칸, 그 밖의 글자 = 1칸으로 세어 최대 6칸 (예: 한글 2자 + 영문 2자) */
+  const NAME_UNITS = 6;
+  const isHangul = ch => /[ᄀ-ᇿ㄰-㆏가-힣]/.test(ch);
+  function clipName(str) {
+    let units = 0, out = '';
+    for (const ch of Array.from(str)) {
+      const w = isHangul(ch) ? 2 : 1;
+      if (units + w > NAME_UNITS) return { text: out, cut: true };
+      units += w; out += ch;
+    }
+    return { text: out, cut: false };
+  }
+  function enforceNameLimit() {
+    const r = clipName(input.value);
+    if (r.cut) {
+      input.value = r.text;
+      setMsg('이름은 한글 3글자, 영문 6글자까지 입력할 수 있어요.');
+    }
+  }
+  input.addEventListener('input', e => {
+    /* 한글 조합 중에는 자르지 않고, 조합이 끝난 뒤에 자름 */
+    if (e.isComposing) return;
+    enforceNameLimit();
+  });
+  input.addEventListener('compositionend', () => setTimeout(enforceNameLimit, 0));
+
   function tryAdd() {
     if (racing || counting) return;
-    const name = input.value.trim().replace(/\s+/g, ' ');
+    const name = clipName(input.value.trim().replace(/\s+/g, ' ')).text.trim();
     if (!name) {
       /* 한글 입력 중 Enter가 두 번 들어오는 브라우저: 방금 추가했으면 조용히 넘어감 */
       if (Date.now() - lastAddAt < 400) return;
