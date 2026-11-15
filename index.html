@@ -687,6 +687,18 @@ input[type="text"]:disabled { opacity: 0.55; }
   font-size: 10px;
 }
 .arena.full.wide.landscape .tfoot { padding-top: 3px; }
+
+/* 큰 PC 모니터(마우스 사용 + 넓은 화면)에서만: 레인이 화면 높이를 채우도록 말·이름표·번호판을 키움.
+   스마트폰·태블릿(터치)은 이 규칙이 적용되지 않음 */
+.arena.full.big.landscape .lanes { padding-left: 54px; padding-right: 16px; }
+.arena.full.big.landscape .lanes::before { left: 50px; width: 3px; }
+.arena.full.big.landscape .lanes::after { width: 16px; background-size: 16px 16px; }
+.arena.full.big.landscape .numbadge { left: -48px; width: 38px; height: 38px; border-radius: 10px; font-size: 21px; }
+.arena.full.big.landscape .tag { padding: 0 12px; gap: 6px; font-size: clamp(11px, calc(var(--th) * 0.5), 20px); }
+/* 레인이 높아도 말과 이름표가 레인 세로 가운데(번호판 높이)에 오도록 */
+.arena.full.big.landscape .lane .horse { bottom: calc((var(--lh) - var(--hw) * 0.6667) / 2); }
+.arena.full.big.landscape .lane .tag { top: calc(var(--lh) / 2 - var(--th) / 2); }
+.arena.full.big.landscape .rk { font-size: clamp(10px, calc(var(--th) * 0.42), 16px); }
 /* 경주 종료 후 전체화면(가로) 동안에는 다시 시작 버튼을 숨김 (세로 복귀 후 다시 표시) */
 .arena.full .startbtn { display: none; }
 
@@ -1192,6 +1204,14 @@ input[type="text"]:disabled { opacity: 0.55; }
   /* 전체 화면 모드: 시작하면 LIVE+경주로를 화면 가득, 끝나면 원래 크기 */
   let isFull = false;
   let celebTimer = 0;
+  /* 큰 PC 모니터 판별: 마우스(정밀 포인터+호버)를 쓰고 화면 너비 1280px·높이 800px 이상.
+     터치 기기(스마트폰·태블릿)는 해당하지 않으므로 기존 동작 그대로 */
+  const isBigScreen = () => {
+    try {
+      return matchMedia('(hover: hover) and (pointer: fine)').matches &&
+        window.innerWidth >= 1280 && window.innerHeight >= 800;
+    } catch (e) { return false; }
+  };
   /* 세로 화면이면 경주장을 시계방향 90도 회전해 가로 모드처럼 보여줌.
      폰을 실제로 가로로 돌리면 회전을 풀고 그대로 가로 화면을 사용 */
   function fitRot() {
@@ -1209,6 +1229,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     /* 회전했거나 실제 가로 화면이면 가로용 압축 배치 사용 */
     const landscape = rot || W > H;
     arenaEl.classList.toggle('landscape', landscape);
+    arenaEl.classList.toggle('big', isBigScreen() && !rot);
     arenaEl.classList.toggle('wide', landscape || players.length <= 4);
   }
   function fitLanes() {
@@ -1218,6 +1239,14 @@ input[type="text"]:disabled { opacity: 0.55; }
       /* 참가 인원에 따라 레인 높이를 재계산합니다.
          적은 인원은 말을 크게, 8명은 화면 안에 모두 들어오도록 자동 축소합니다. */
       const available = Math.max(160, stageEl.clientHeight - 8);
+      if (arenaEl.classList.contains('big')) {
+        /* 큰 PC 모니터: 레인이 경주장 높이를 위아래 꽉 채우도록 나누고, 말은 너무 커지지 않게 상한을 둠 */
+        const lh = Math.max(60, Math.floor(available / players.length));
+        arenaEl.style.setProperty('--lh', lh + 'px');
+        arenaEl.style.setProperty('--hw', clamp(lh * 1.0, 70, 240) + 'px');
+        arenaEl.style.setProperty('--th', clamp(lh * 0.22, 22, 40) + 'px');
+        return;
+      }
       const lh = clamp(Math.floor(available / players.length), 22, 104);
       arenaEl.style.setProperty('--lh', lh + 'px');
       arenaEl.style.setProperty('--hw', clamp(lh * 1.18, 26, 116) + 'px');
@@ -1248,7 +1277,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     if (!isFull) return;
     isFull = false;
     clearTimeout(celebTimer);
-    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot');
+    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'big');
     ['--lh', '--hw', '--th', 'width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
     slotEl.style.height = '';
     /* 줄어든 경주장 박스를 브라우저 화면 세로 중간에 맞춤 (전체화면 해제가 끝난 뒤 한 번 더) */
