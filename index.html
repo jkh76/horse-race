@@ -784,7 +784,7 @@ input[type="text"]:disabled { opacity: 0.55; }
         <label class="sr" for="nameInput">말 이름</label>
         <input id="nameInput" type="text" maxlength="8" placeholder="이름을 입력하세요 (예: 홍길동)" enterkeyhint="done">
         <div class="btnrow">
-          <button type="submit" id="addBtn" class="b3d blue">➕ 추가</button>
+          <button type="button" id="addBtn" class="b3d blue">➕ 추가</button>
           <button type="button" id="resetBtn" class="b3d grey">🔄 초기화</button>
         </div>
         <div class="dur" role="radiogroup" aria-labelledby="durLabel">
@@ -1648,19 +1648,40 @@ input[type="text"]:disabled { opacity: 0.55; }
     renderRoster(); resetRace();
   }
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
+  /* 이름 추가. 클로드 미리보기 같은 샌드박스 화면에서는 form 제출(submit)이 막혀 있어서
+     추가 버튼 클릭과 Enter 키를 직접 처리합니다. */
+  let lastAddAt = 0, pendingEnter = false;
+  function tryAdd() {
     if (racing || counting) return;
     const name = input.value.trim().replace(/\s+/g, ' ');
-    if (!name) { setMsg('이름을 입력해 주세요.'); input.focus(); return; }
+    if (!name) {
+      /* 한글 입력 중 Enter가 두 번 들어오는 브라우저: 방금 추가했으면 조용히 넘어감 */
+      if (Date.now() - lastAddAt < 400) return;
+      setMsg('이름을 입력해 주세요.'); input.focus(); return;
+    }
     if (players.length >= MAX) { setMsg('최대 ' + MAX + '명까지 참가할 수 있어요.'); input.focus(); return; }
     if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) { setMsg('이미 있는 이름이에요.'); input.focus(); return; }
     setMsg('');
     addPlayer(name);
+    lastAddAt = Date.now();
     sfx.add();
     input.value = '';
     renderRoster(); resetRace();
     if (!input.disabled) input.focus();
+  }
+  form.addEventListener('submit', e => { e.preventDefault(); tryAdd(); });
+  addBtn.addEventListener('click', tryAdd);
+  input.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    /* 한글 조합 중 Enter: 조합이 끝난 뒤에 추가 */
+    if (e.isComposing || e.keyCode === 229) { pendingEnter = true; return; }
+    e.preventDefault();
+    tryAdd();
+  });
+  input.addEventListener('compositionend', () => {
+    if (!pendingEnter) return;
+    pendingEnter = false;
+    setTimeout(() => { if (input.value.trim()) tryAdd(); }, 0);
   });
 
   resetBtn.addEventListener('click', () => {
