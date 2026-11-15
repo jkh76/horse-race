@@ -440,6 +440,10 @@ input[type="text"]:disabled { opacity: 0.55; }
 }
 .startbtn:active:not(:disabled) { transform: scale(0.97); }
 .startbtn:disabled { background: #7D8A99; cursor: not-allowed; }
+/* 다크호스 모드(폭주 기능) 켜고 끄기 */
+.dhbtn { min-width: 200px; height: 40px; padding: 0 20px; border: 3px solid #fff; border-radius: 999px; background: #3A4150; color: #D5DAE3; font-family: var(--font-display); font-size: 16px; cursor: pointer; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28); transition: transform 0.1s ease, background 0.15s; }
+.dhbtn[aria-pressed="true"] { background: linear-gradient(90deg, #2A1A3A, #5A1E1E); color: #FFD27A; box-shadow: 0 0 0 2px #FF7A1A, 0 6px 16px rgba(255, 90, 20, 0.45); }
+.dhbtn:active:not(:disabled) { transform: scale(0.97); }
 
 .countdown { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; pointer-events: none; }
 .countdown span {
@@ -554,6 +558,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 .pfimg::after { content: ""; position: absolute; inset: 0; z-index: 3; background: #fff; opacity: 0; pointer-events: none; animation: pflash 0.8s ease-out 0.9s; }
 @keyframes pflash { 0% { opacity: 0; } 10% { opacity: 0.95; } 100% { opacity: 0; } }
 .stage.done .lanes { min-height: 420px; }
+.stage.done.hasdh .lanes { min-height: 470px; } /* 다크호스 모드 버튼(약 50px)만큼 여유 */
 /* 전체화면(가로) 동안에는 공간이 좁아 판독 사진을 숨기고, 원래 화면으로 돌아오면 표시 (큰 PC 모니터는 그대로 표시) */
 .arena.full:not(.big) .pfoto { display: none; }
 @keyframes drop { from { transform: translateY(-30px) scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -579,6 +584,14 @@ input[type="text"]:disabled { opacity: 0.55; }
 @keyframes swing { 0% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } 100% { transform: rotate(-30deg); } }
 @keyframes knee { 0% { transform: rotate(2deg); } 50% { transform: rotate(55deg); } 100% { transform: rotate(2deg); } }
 @keyframes wave { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+/* 폭주하는 말: 몸통 뒤로 불꽃이 피어오르고 주황빛이 감돎 */
+.horse svg.flame { position: absolute; left: 0; top: 0; z-index: -1; pointer-events: none; opacity: 0; transform: scale(0.6); transform-origin: 45% 70%; transition: opacity 0.18s, transform 0.18s; }
+.horse.boost svg.flame { opacity: 1; transform: none; }
+.horse.boost > svg:not(.flame) { filter: drop-shadow(0 0 3px rgba(255, 122, 26, 0.95)) drop-shadow(0 0 7px rgba(255, 70, 20, 0.6)); }
+.flame .f1 { fill: #FF4A1C; } .flame .f2 { fill: #FF9A1F; } .flame .f3 { fill: #FFE45C; }
+.flame path { transform-box: fill-box; transform-origin: 70% 100%; }
+.horse.boost .flame path { animation: flick 0.16s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+@keyframes flick { from { transform: scale(0.85, 0.78) skewX(4deg); } to { transform: scale(1.06, 1.12) skewX(-6deg); } }
 .tag {
   position: absolute;
   left: 0;
@@ -738,7 +751,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 .arena.full.big.landscape .lane .tag { top: calc(var(--lh) / 2 - var(--th) / 2); }
 .arena.full.big.landscape .rk { font-size: clamp(10px, calc(var(--th) * 0.42), 16px); }
 /* 경주 종료 후 전체화면(가로) 동안에는 다시 시작 버튼을 숨김 (세로 복귀 후 다시 표시) */
-.arena.full .startbtn { display: none; }
+.arena.full .startbtn, .arena.full .dhbtn { display: none; }
 
 /* 세로 화면에서 시작하면 경주장을 시계방향 90도 돌려 가로 모드로 보여줌.
    회전 전 기준 너비 = 화면 높이, 높이 = 화면 너비 (크기·위치는 JS가 지정) */
@@ -763,7 +776,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 
 @media (prefers-reduced-motion: reduce) {
   .arena.full { animation: none; }
-  .running .leg, .running .low, .running .tail { animation: none; }
+  .running .leg, .running .low, .running .tail, .horse.boost .flame path { animation: none; }
   .livebadge.on, .numbadge.bump, .countdown span, .winner, .podium li, .pfoto, .pfimg::after { animation: none; }
   .lanes { transition: none; }
   .res, .rk { animation: none; }
@@ -788,7 +801,7 @@ input[type="text"]:disabled { opacity: 0.55; }
           <button type="button" id="resetBtn" class="b3d grey">🔄 초기화</button>
         </div>
         <div class="dur" role="radiogroup" aria-labelledby="durLabel">
-          <span class="durlabel" id="durLabel">⏱️ 경주 시간:</span>
+          <span class="durlabel" id="durLabel">📏 경주 거리:</span>
           <div class="seg">
             <label><input class="sr" type="radio" name="dur" value="10" checked><span>500m</span></label>
             <label><input class="sr" type="radio" name="dur" value="15"><span>750m</span></label>
@@ -821,6 +834,7 @@ input[type="text"]:disabled { opacity: 0.55; }
           </div>
           <div class="pfoto" id="pfoto" hidden aria-label="결승 판독 사진"></div>
           <button type="button" id="startBtn" class="startbtn">🏁 시작</button>
+          <button type="button" id="dhBtn" class="dhbtn" aria-pressed="false">🐴 다크호스 모드 꺼짐</button>
         </div>
         <div class="countdown" id="countdown" role="status" aria-live="polite" hidden></div>
         <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
@@ -850,7 +864,8 @@ input[type="text"]:disabled { opacity: 0.55; }
 
   const $ = id => document.getElementById(id);
   const form = $('addForm'), input = $('nameInput'), addBtn = $('addBtn'), resetBtn = $('resetBtn');
-  const sampleBtn = $('sampleBtn'), soundBtn = $('soundBtn'), startBtn = $('startBtn');
+  const sampleBtn = $('sampleBtn'), soundBtn = $('soundBtn'), startBtn = $('startBtn'), dhBtn = $('dhBtn');
+  let darkHorse = false; /* 다크호스 모드: 켜져 있을 때만 경주 중 폭주하는 말이 나옴 */
   const badgeEl = $('badge'), msgEl = $('msg'), rosterEl = $('roster'), countEl = $('count');
   const stageEl = $('stage'), lanesEl = $('lanes'), ctaEl = $('cta'), podiumEl = $('podium');
   const liveEl = $('liveBadge'), statusEl = $('status'), clockEl = $('clock'), stateEl = $('resState');
@@ -1080,6 +1095,20 @@ input[type="text"]:disabled { opacity: 0.55; }
       '<g>' + leg(28, -0.12) + leg(52, -0.35) + '</g>' +
     '</svg>';
 
+  /* 폭주 불꽃: 말 SVG와 같은 좌표계(96x64)에서 등 위로 피어올라 뒤쪽으로 날리는 불길 */
+  const tongue = (bx, by, w, h, cls, d) =>
+    '<path class="' + cls + '" style="--d:' + d + 's" d="M' + (bx - w / 2) + ' ' + by +
+    ' C' + (bx - w / 2) + ' ' + (by - h * 0.5) + ' ' + (bx - w * 0.3 - h * 0.25) + ' ' + (by - h * 0.72) + ' ' + (bx - h * 0.5) + ' ' + (by - h) +
+    ' C' + (bx + w * 0.15) + ' ' + (by - h * 0.62) + ' ' + (bx + w / 2) + ' ' + (by - h * 0.45) + ' ' + (bx + w / 2) + ' ' + by + ' Z"/>';
+  const flameSVG = () => {
+    const spots = [[22, 34, 16, 26, -0.05], [34, 29, 16, 30, -0.11], [46, 28, 15, 27, 0], [57, 30, 13, 22, -0.08], [12, 40, 14, 18, -0.03]];
+    let s = '<svg class="flame" viewBox="0 0 96 64" aria-hidden="true" focusable="false">';
+    spots.forEach(([x, y, w, h, d]) => { s += tongue(x, y, w, h, 'f1', d); });
+    spots.forEach(([x, y, w, h, d]) => { s += tongue(x + 1, y, w * 0.65, h * 0.68, 'f2', d - 0.04); });
+    spots.forEach(([x, y, w, h, d]) => { s += tongue(x + 1.5, y, w * 0.35, h * 0.4, 'f3', d - 0.07); });
+    return s + '</svg>';
+  };
+
   const setMsg = t => { msgEl.textContent = t || ''; };
   const freeColor = () => {
     const used = players.map(p => p.color);
@@ -1126,6 +1155,10 @@ input[type="text"]:disabled { opacity: 0.55; }
     ctaEl.hidden = busy || players.length === 0;
     stageEl.classList.toggle('idle', !busy && players.length > 0);
     startBtn.disabled = busy || players.length < MIN;
+    dhBtn.disabled = busy;
+    /* 다크호스 모드는 말이 4마리 이상일 때만 선택 가능 (폭주는 4위 이하 말 중에서 나옴) */
+    dhBtn.hidden = players.length < 4;
+    stageEl.classList.toggle('hasdh', !dhBtn.hidden);
     const showWin = !busy && hasRaced && finished.length > 0;
     stageEl.classList.toggle('done', showWin);
     winnerEl.hidden = !showWin;
@@ -1267,7 +1300,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       const nm = document.createElement('span'); nm.textContent = p.name; tag.appendChild(nm);
       const rkEl = document.createElement('b'); rkEl.className = 'rk'; rkEl.textContent = '1위'; tag.appendChild(rkEl);
       const horse = document.createElement('div'); horse.className = 'horse'; horse.style.color = p.color;
-      horse.innerHTML = horseSVG(i + 1);
+      horse.innerHTML = flameSVG() + horseSVG(i + 1);
       lane.append(badge, tag, horse);
       lanesEl.appendChild(lane);
       laneEls.push(lane); horseEls.push(horse); tagEls.push(tag); badgeEls.push(badge);
@@ -1384,6 +1417,8 @@ input[type="text"]:disabled { opacity: 0.55; }
     const phase = u < 0.15 ? 0 : u < 0.6 ? 1 : u < 0.85 ? 2 : 3;
     const n = players[lead].name;
     if (phase >= 2 && midName === null) midName = n;
+    /* 폭주 중계 멘트는 잠시 유지 */
+    if (cm.hold && t < cm.hold) { cm.lead = lead; cm.phase = phase; return; }
     const changed = cm.lead >= 0 && lead !== cm.lead && u > 0.15 && u < 0.95;
     let text = null;
     if (changed) {
@@ -1489,9 +1524,18 @@ input[type="text"]:disabled { opacity: 0.55; }
         { a: 0.020, f: 2 + Math.random(), ph: Math.random() * 6.283 },
         { a: 0.010, f: 3 + Math.random(), ph: Math.random() * 6.283 }
       ],
-      last: 0, done: false
+      c: 0, fin: 0, last: 0, done: false
     }));
     const maxT = Math.max(...race.map(r => r.T));
+    /* 폭주: 선두가 중반(50~70% 지점 중 무작위)을 넘으면, 그 순간 1~3위를 뺀 말 중 하나가
+       경주 길이별 시간(10초 1.5초, 15초 2.3초, 20초 3초) 동안 1.2배 속도로 달림. 참가자가 4명 이상일 때만 발생 */
+    const BOOST_MUL = 1.2, BOOST_SEC = ({ 10: 1.5, 15: 2.3, 20: 3 })[getDur()] || 1.5;
+    const boostAt = 0.5 + Math.random() * 0.2;
+    let boost = null, boostTried = !darkHorse || n < 4;
+    const setBoostFx = (i, on) => {
+      horseEls[i].classList.toggle('boost', on);
+      try { horseEls[i].getAnimations({ subtree: true }).forEach(a => { if (!race[i].done) a.playbackRate = on ? BOOST_MUL : 1; }); } catch (e) { /* 미지원 브라우저는 그대로 */ }
+    };
     musicStart(maxT + 1);
 
     cm = { text: '', t: -9, phase: -1, lead: -1, k: 0 }; midName = null;
@@ -1502,10 +1546,18 @@ input[type="text"]:disabled { opacity: 0.55; }
     const t0 = performance.now();
     const frame = now => {
       const t = Math.max(0, (now - t0) / 1000);
+      const prevT = lastT, dt = Math.max(0, t - prevT);
       lastT = t;
       const just = [];
       race.forEach((r, i) => {
-        const u = Math.min(t / r.T, 1);
+        if (!r.done) {
+          /* 각 말의 진행 시계: 폭주 구간과 겹친 시간만큼 1.2배로 흐름 */
+          let adv = dt;
+          if (boost && boost.i === i) adv += (BOOST_MUL - 1) * Math.max(0, Math.min(t, boost.t1) - Math.max(prevT, boost.t0));
+          if (r.c + adv >= r.T) r.fin = adv > 0 ? prevT + (r.T - r.c) * dt / adv : t;
+          r.c = Math.min(r.T, r.c + adv);
+        }
+        const u = r.c / r.T;
         let p = 1;
         if (u < 1) {
           let w = 0;
@@ -1516,7 +1568,20 @@ input[type="text"]:disabled { opacity: 0.55; }
         }
         r.last = p; pos[i] = p;
       });
-      just.sort((a, b) => race[a].T - race[b].T).forEach(i => finishHorse(i, race[i].T));
+      just.sort((a, b) => race[a].fin - race[b].fin).forEach(i => finishHorse(i, race[i].fin));
+      if (boost && boost.on && (t >= boost.t1 || race[boost.i].done)) { boost.on = false; horseEls[boost.i].classList.remove('boost'); }
+      if (!boostTried && Math.max(...pos) >= boostAt) {
+        boostTried = true;
+        const pick = [...Array(n).keys()].filter(i => !race[i].done).sort((a, b) => pos[b] - pos[a]).slice(3);
+        if (pick.length) {
+          const i = pick[Math.floor(Math.random() * pick.length)];
+          boost = { i, t0: t, t1: t + BOOST_SEC, on: true };
+          setBoostFx(i, true);
+          const txt = '🔥 ' + players[i].name + ', 폭주합니다! 무서운 속도로 치고 나갑니다!';
+          cm.text = txt; cm.t = t; cm.hold = t + 1.3; putStatus('🎙️ ' + txt);
+        }
+      }
+      if (boost && !boost.on && !boost.cleared) { boost.cleared = true; if (!race[boost.i].done) setBoostFx(boost.i, false); }
       if (!pfSnap && finished.length) pfSnap = { pos: pos.slice(), track: laneW - hw, hw };
       updateRanks();
       commentary(t);
@@ -1740,6 +1805,12 @@ input[type="text"]:disabled { opacity: 0.55; }
 
   durInputs.forEach(i => i.addEventListener('change', () => { updateHead(); updateControls(); }));
   startBtn.addEventListener('click', beginCountdown);
+  dhBtn.addEventListener('click', () => {
+    darkHorse = !darkHorse;
+    dhBtn.setAttribute('aria-pressed', String(darkHorse));
+    dhBtn.textContent = darkHorse ? '🔥 다크호스 모드 켜짐' : '🐴 다크호스 모드 꺼짐';
+    sfx.add();
+  });
 
   const remeasure = () => {
     fitRot(); fitLanes(); measure(); applyPos(lastT); fitWinner();
