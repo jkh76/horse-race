@@ -517,6 +517,46 @@ input[type="text"]:disabled { opacity: 0.55; }
 .p1 .pstep { --sc: var(--medal-gold); height: 58px; border-radius: 10px 10px 0 0; color: var(--medal-gold-fg); font-size: 32px; text-shadow: 0 2px 0 rgba(255, 255, 255, 0.35); }
 .p2 .pstep { --sc: var(--medal-silver); height: 42px; border-radius: 10px 0 0 0; font-size: 24px; }
 .p3 .pstep { --sc: var(--medal-bronze); height: 30px; border-radius: 0 10px 0 0; font-size: 19px; }
+/* 결승 판독 사진: 1위가 결승선에 코를 댄 순간을 찍은 것처럼 1·2위를 보여줌 (시상대 아래) */
+.pfoto {
+  width: min(100%, 340px);
+  padding: 6px 6px 8px;
+  border-radius: 10px;
+  background: #F7F3EA;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.32);
+  color: #2A2622;
+  animation: drop 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) 0.7s backwards;
+}
+.pfoto[hidden] { display: none; }
+.pfhead { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; padding: 0 2px 5px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.pftitle { letter-spacing: 0.06em; }
+.pfmargin { color: #B3261E; font-family: var(--font-display); font-weight: 400; font-size: 14px; overflow: hidden; text-overflow: ellipsis; }
+.pfimg {
+  --lx: 70%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, #C9A77C, #A9855A);
+  filter: sepia(0.3) contrast(1.06);
+}
+.pflane { position: relative; height: 46px; }
+.pflane + .pflane { border-top: 1px dashed rgba(255, 255, 255, 0.45); }
+.pfrun { position: absolute; bottom: 3px; right: calc(100% - var(--lx) - 4px + var(--off, 0px)); display: flex; align-items: center; gap: 4px; }
+.pftag { padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.2; white-space: nowrap; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25); }
+.horse.pfh { position: relative; left: auto; bottom: auto; flex: none; width: 64px; will-change: auto; }
+/* 사진이므로 달리는 자세 그대로 멈춘 다리 */
+.pfh .leg { animation: swing 0.46s ease-in-out infinite paused; animation-delay: calc(var(--d, 0s) - var(--ph, 0s)); }
+.pfh .low { animation: knee 0.46s ease-in-out infinite paused; animation-delay: calc(var(--d, 0s) - var(--ph, 0s)); }
+.pfline { position: absolute; top: 0; bottom: 0; left: var(--lx); width: 2px; margin-left: -1px; background: #E0241B; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55); z-index: 2; }
+.pftime { position: absolute; top: 50%; left: calc(var(--lx) + 8px); transform: translateY(-50%); color: #fff; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); white-space: nowrap; }
+.pfrk { position: absolute; top: 4px; left: 5px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; background: rgba(0, 0, 0, 0.45); color: #fff; font-family: var(--font-display); font-size: 12px; line-height: 1; }
+.pfimg::after { content: ""; position: absolute; inset: 0; z-index: 3; background: #fff; opacity: 0; pointer-events: none; animation: pflash 0.8s ease-out 0.9s; }
+@keyframes pflash { 0% { opacity: 0; } 10% { opacity: 0.95; } 100% { opacity: 0; } }
+.stage.done .lanes { min-height: 420px; }
+/* 전체화면(가로) 동안에는 공간이 좁아 판독 사진을 숨기고, 원래 화면으로 돌아오면 표시 (큰 PC 모니터는 그대로 표시) */
+.arena.full:not(.big) .pfoto { display: none; }
 @keyframes drop { from { transform: translateY(-30px) scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
 .confetti { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; pointer-events: none; }
 
@@ -726,7 +766,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 @media (prefers-reduced-motion: reduce) {
   .arena.full { animation: none; }
   .running .leg, .running .low, .running .tail { animation: none; }
-  .livebadge.on, .numbadge.bump, .countdown span, .winner, .podium li { animation: none; }
+  .livebadge.on, .numbadge.bump, .countdown span, .winner, .podium li, .pfoto, .pfimg::after { animation: none; }
   .lanes { transition: none; }
   .res, .rk { animation: none; }
 }
@@ -781,6 +821,7 @@ input[type="text"]:disabled { opacity: 0.55; }
           <div class="winner" id="winner" hidden>
             <ol class="podium" id="podium" aria-label="1위부터 3위까지"></ol>
           </div>
+          <div class="pfoto" id="pfoto" hidden aria-label="결승 판독 사진"></div>
           <button type="button" id="startBtn" class="startbtn">🏁 시작</button>
         </div>
         <div class="countdown" id="countdown" role="status" aria-live="polite" hidden></div>
@@ -818,7 +859,8 @@ input[type="text"]:disabled { opacity: 0.55; }
   const liveEl = $('liveBadge'), statusEl = $('status'), clockEl = $('clock'), stateEl = $('resState');
   const resultsEl = $('results'), emptyEl = $('resultEmpty'), cdEl = $('countdown');
   const stiEl = $('sti'), sttEl = $('stt');
-  const winnerEl = $('winner'), confettiEl = $('confetti');
+  const winnerEl = $('winner'), confettiEl = $('confetti'), pfotoEl = $('pfoto');
+  let pfSnap = null; /* 1위가 결승선을 지나는 순간 모든 말의 위치 */
   const arenaEl = $('arena'), slotEl = $('arenaSlot');
 
   const durInputs = document.querySelectorAll('input[name="dur"]');
@@ -1107,7 +1149,50 @@ input[type="text"]:disabled { opacity: 0.55; }
       });
       fitWinner();
     }
+    pfotoEl.hidden = !(showWin && finished.length >= 2);
+    if (!pfotoEl.hidden) renderPhoto();
     startBtn.textContent = hasRaced ? '🏁 다시 시작' : '🏁 시작';
+  }
+
+  /* 마신(말 몸길이) 차이를 경마 용어로 */
+  const marginWord = L => L < 0.06 ? '코차' : L < 0.15 ? '머리차' : L < 0.3 ? '목차'
+    : L < 0.62 ? '1/2마신' : L < 0.87 ? '3/4마신' : (Math.round(L * 2) / 2) + '마신';
+
+  /* 결승 판독 사진: 1위가 결승선에 코를 댄 순간, 2위가 얼마나 뒤에 있었는지 */
+  function renderPhoto() {
+    const a = finished[0], b = finished[1];
+    const dt = Math.max(0, b.time - a.time);
+    let L = 0;
+    if (pfSnap && pfSnap.hw > 0) {
+      L = (1 - pfSnap.pos[b.no - 1]) * pfSnap.track / pfSnap.hw;
+      if (!(L > 0.01)) L = dt / a.time * pfSnap.track / pfSnap.hw;
+    }
+    const HW = 64, off = Math.min(L * HW, 150);
+    pfotoEl.textContent = '';
+    const head = document.createElement('div'); head.className = 'pfhead';
+    const ti = document.createElement('span'); ti.className = 'pftitle'; ti.textContent = '📸 PHOTO FINISH';
+    const mg = document.createElement('span'); mg.className = 'pfmargin';
+    mg.textContent = marginWord(L) + ' 승부 · ' + dt.toFixed(2) + '초 차';
+    head.append(ti, mg);
+    const img = document.createElement('div'); img.className = 'pfimg';
+    const line = document.createElement('span'); line.className = 'pfline';
+    img.appendChild(line);
+    [a, b].forEach((p, k) => {
+      const lane = document.createElement('div'); lane.className = 'pflane';
+      const rk = document.createElement('span'); rk.className = 'pfrk'; rk.textContent = k + 1;
+      const run = document.createElement('div'); run.className = 'pfrun';
+      run.style.setProperty('--off', (k ? off : 0).toFixed(1) + 'px');
+      const tag = document.createElement('span'); tag.className = 'pftag'; tag.textContent = p.name;
+      tag.style.background = p.color; tag.style.color = textOn(p.color);
+      const hs = document.createElement('div'); hs.className = 'horse pfh'; hs.style.color = p.color;
+      hs.style.setProperty('--ph', (k ? 0.3 : 0.12) + 's');
+      hs.innerHTML = horseSVG(p.no);
+      run.append(tag, hs);
+      const tm = document.createElement('span'); tm.className = 'pftime'; tm.textContent = p.time.toFixed(2) + '초';
+      lane.append(rk, run, tm);
+      img.appendChild(lane);
+    });
+    pfotoEl.append(head, img);
   }
 
   /* 이름이 길면 시상대 칸 안에 한 줄로 들어오도록 글자 크기를 줄임 (화면 크기가 바뀔 때마다 다시 계산) */
@@ -1394,7 +1479,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   function runRace() {
     if (racing || players.length < MIN) return;
     setMsg('');
-    finished = [];
+    finished = []; pfSnap = null;
     resultsEl.textContent = '';
     emptyEl.hidden = false;
     buildLanes();
@@ -1439,6 +1524,7 @@ input[type="text"]:disabled { opacity: 0.55; }
         r.last = p; pos[i] = p;
       });
       just.sort((a, b) => race[a].T - race[b].T).forEach(i => finishHorse(i, race[i].T));
+      if (!pfSnap && finished.length) pfSnap = { pos: pos.slice(), track: laneW - hw, hw };
       updateRanks();
       commentary(t);
       applyPos(t);
