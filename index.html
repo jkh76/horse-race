@@ -380,7 +380,6 @@ input[type="text"]:disabled { opacity: 0.55; }
   font-variant-numeric: tabular-nums;
 }
 
-.tfoot { flex: none; display: flex; justify-content: center; padding-top: 10px; }
 .trackframe { padding: 10px 10px 12px; border: 6px solid var(--edge); border-radius: 26px; background: var(--frame); min-width: 0; }
 .thead { display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px 8px; color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .stage {
@@ -726,7 +725,6 @@ input[type="text"]:disabled { opacity: 0.55; }
   gap: 3px;
   font-size: 10px;
 }
-.arena.full.wide.landscape .tfoot { padding-top: 3px; }
 
 /* 큰 PC 모니터(마우스 사용 + 넓은 화면)에서만: 레인이 화면 높이를 채우도록 말·이름표·번호판을 키움.
    스마트폰·태블릿(터치)은 이 규칙이 적용되지 않음 */
@@ -810,7 +808,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     <div class="live">
       <span class="livebadge" id="liveBadge">LIVE</span>
       <span class="status" id="status" role="status"><span class="sti" id="sti">⏳</span><span class="stt" id="stt">참가자를 기다리는 중</span></span>
-      
+      <span class="clockpill">⏱️ <span id="clock">0.0초</span></span>
     </div>
 
     <section class="trackframe" aria-label="경주로">
@@ -827,7 +825,6 @@ input[type="text"]:disabled { opacity: 0.55; }
         <div class="countdown" id="countdown" role="status" aria-live="polite" hidden></div>
         <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
       </div>
-      <div class="tfoot"><span class="clockpill">⏱️ <span id="clock">0.0초</span></span></div>
     </section>
     </div></div>
 
@@ -1154,10 +1151,6 @@ input[type="text"]:disabled { opacity: 0.55; }
     startBtn.textContent = hasRaced ? '🏁 다시 시작' : '🏁 시작';
   }
 
-  /* 마신(말 몸길이) 차이를 경마 용어로 */
-  const marginWord = L => L < 0.06 ? '코차' : L < 0.15 ? '머리차' : L < 0.3 ? '목차'
-    : L < 0.62 ? '1/2마신' : L < 0.87 ? '3/4마신' : (Math.round(L * 2) / 2) + '마신';
-
   /* 결승 판독 사진: 1위가 결승선에 코를 댄 순간, 2위가 얼마나 뒤에 있었는지 */
   function renderPhoto() {
     const a = finished[0], b = finished[1];
@@ -1172,7 +1165,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     const head = document.createElement('div'); head.className = 'pfhead';
     const ti = document.createElement('span'); ti.className = 'pftitle'; ti.textContent = '📸 PHOTO FINISH';
     const mg = document.createElement('span'); mg.className = 'pfmargin';
-    mg.textContent = marginWord(L) + ' 승부 · ' + dt.toFixed(2) + '초 차';
+    mg.textContent = dt.toFixed(2) + '초 차';
     head.append(ti, mg);
     const img = document.createElement('div'); img.className = 'pfimg';
     const line = document.createElement('span'); line.className = 'pfline';
