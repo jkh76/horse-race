@@ -881,7 +881,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.2 · 2026-11-16</p>
+  <p class="ver" id="ver">v1.3 · 2026-11-16</p>
 </main>
 
 <script>
@@ -1570,9 +1570,30 @@ input[type="text"]:disabled { opacity: 0.55; }
     fitRot();
     fitLanes();
   }
+  /* 화면 켜짐 유지(Wake Lock): 경주 시작부터 시상식이 끝날 때까지만 화면이 어두워지거나 잠기지 않게 함.
+     다른 앱으로 갔다 돌아오면 경주 중일 때만 다시 켬. 지원하지 않는 브라우저에서는 아무 일도 하지 않음 */
+  let wakeLock = null, wakeWanted = false;
+  async function keepAwake() {
+    wakeWanted = true;
+    try {
+      if (!('wakeLock' in navigator) || wakeLock) return;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (e) { wakeLock = null; /* 거부되거나 미지원이면 무시 */ }
+  }
+  function allowSleep() {
+    wakeWanted = false;
+    const w = wakeLock; wakeLock = null;
+    if (w) { try { w.release().catch(() => {}); } catch (e) { /* 무시 */ } }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && wakeWanted) keepAwake();
+  });
+
   function exitFull() {
     if (!isFull) return;
     isFull = false;
+    allowSleep();
     clearTimeout(celebTimer);
     arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'big');
     ['--lh', '--hw', '--th', '--scn', 'width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
@@ -1621,6 +1642,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 
   function resetRace() {
     cancelAnimationFrame(raf);
+    allowSleep();
     clearTimeout(celebTimer);
     musicStop();
     stopConfetti();
@@ -1713,11 +1735,14 @@ input[type="text"]:disabled { opacity: 0.55; }
       c: 0, fin: 0, last: 0, done: false
     }));
     const maxT = Math.max(...race.map(r => r.T));
-    /* 폭주: 선두가 중반(50~70% 지점 중 무작위)을 넘으면, 그 순간 1~3위를 뺀 말 중 하나가
-       경주 길이별 시간(10초 1.5초, 15초 2.3초, 20초 3초) 동안 1.2배 속도로 달림. 참가자가 4명 이상일 때만 발생 */
+    /* 폭주(다크호스): 경주 거리별로 500m 1마리, 750m 2마리, 1,000m 3마리.
+       선두가 50~75% 구간의 무작위 지점들을 지날 때마다, 그 순간 1~3위가 아니고 아직 폭주하지 않은 말 중 하나가
+       경주 길이별 시간(500m 1.5초, 750m 2.3초, 1,000m 3초) 동안 1.2배 속도로 달림. 참가자가 4명 이상일 때만 발생 */
     const BOOST_MUL = 1.2, BOOST_SEC = ({ 10: 1.5, 15: 2.3, 20: 3 })[getDur()] || 1.5;
-    const boostAt = 0.5 + Math.random() * 0.2;
-    let boost = null, boostTried = !darkHorse || n < 4;
+    const BOOST_N = darkHorse && n >= 4 ? (({ 10: 1, 15: 2, 20: 3 })[getDur()] || 1) : 0;
+    const boostAts = Array.from({ length: BOOST_N }, (_, k) => 0.5 + (k + Math.random()) * (0.25 / BOOST_N));
+    const boosts = [];
+    const boostOf = i => boosts.find(b => b.i === i);
     const setBoostFx = (i, on) => {
       horseEls[i].classList.toggle('boost', on);
       if (on && !ghostImg[i]) ghostImg[i] = makeGhost(players[i].color, i + 1);
@@ -1753,7 +1778,8 @@ input[type="text"]:disabled { opacity: 0.55; }
         if (!r.done) {
           /* 각 말의 진행 시계: 폭주 구간과 겹친 시간만큼 1.2배로 흐름 */
           let adv = dt;
-          if (boost && boost.i === i) adv += (BOOST_MUL - 1) * Math.max(0, Math.min(t, boost.t1) - Math.max(prevT, boost.t0));
+          const bb = boostOf(i);
+          if (bb) adv += (BOOST_MUL - 1) * Math.max(0, Math.min(t, bb.t1) - Math.max(prevT, bb.t0));
           if (r.c + adv >= r.T) r.fin = adv > 0 ? prevT + (r.T - r.c) * dt / adv : t;
           r.c = Math.min(r.T, r.c + adv);
         }
@@ -1769,26 +1795,28 @@ input[type="text"]:disabled { opacity: 0.55; }
         r.last = p; pos[i] = p;
       });
       just.sort((a, b) => race[a].fin - race[b].fin).forEach(i => finishHorse(i, race[i].fin));
-      if (boost && boost.on && (t >= boost.t1 || race[boost.i].done)) { boost.on = false; horseEls[boost.i].classList.remove('boost'); }
-      if (!boostTried && Math.max(...pos) >= boostAt) {
-        boostTried = true;
-        const pick = [...Array(n).keys()].filter(i => !race[i].done).sort((a, b) => pos[b] - pos[a]).slice(3);
+      boosts.forEach(b => { if (b.on && (t >= b.t1 || race[b.i].done)) { b.on = false; horseEls[b.i].classList.remove('boost'); } });
+      while (boostAts.length && Math.max(...pos) >= boostAts[0]) {
+        boostAts.shift();
+        const pick = [...Array(n).keys()].filter(i => !race[i].done).sort((a, b) => pos[b] - pos[a]).slice(3).filter(i => !boostOf(i));
         if (pick.length) {
           const i = pick[Math.floor(Math.random() * pick.length)];
-          boost = { i, t0: t, t1: t + BOOST_SEC, on: true };
+          boosts.push({ i, t0: t, t1: t + BOOST_SEC, on: true });
           setBoostFx(i, true);
-          const txt = '🔥 ' + players[i].name + ', 폭주합니다! 무서운 속도로 치고 나갑니다!';
+          const txt = boosts.length === 1
+            ? '🔥 ' + players[i].name + ', 폭주합니다! 무서운 속도로 치고 나갑니다!'
+            : '🔥 ' + players[i].name + '도 폭주합니다! 다크호스가 또 나타났어요!';
           cm.text = txt; cm.t = t; cm.hold = t + 1.3; putStatus('🎙️ ' + txt);
         }
       }
-      if (boost && !boost.on && !boost.cleared) { boost.cleared = true; if (!race[boost.i].done) setBoostFx(boost.i, false); }
+      boosts.forEach(b => { if (!b.on && !b.cleared) { b.cleared = true; if (!race[b.i].done) setBoostFx(b.i, false); } });
       if (!pfSnap && finished.length) pfSnap = { pos: pos.slice(), track: laneW - hw, hw };
       updateRanks();
       commentary(t);
       applyPos(t);
       if (!RM) {
         const track = laneW - hw;
-        race.forEach((r, i) => { if (!r.done) spawnFx(i, Math.max(0, pos[i] - before[i]) * track, !!(boost && boost.on && boost.i === i), dt); });
+        race.forEach((r, i) => { if (!r.done) spawnFx(i, Math.max(0, pos[i] - before[i]) * track, !!(boostOf(i) && boostOf(i).on), dt); });
         fxStep(dt);
         scrollScenery(dt, 1 - 0.8 * finished.length / n);
         /* 줌 중심: 1위가 들어왔으면 1위 말, 아니면 지금 선두 */
@@ -1902,6 +1930,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   function hideCount() { cdEl.hidden = true; cdEl.textContent = ''; }
 
   function beginCountdown() {
+    if (!(racing || counting || players.length < MIN)) keepAwake(); /* 버튼을 누른 순간에 요청해야 허용됨 */
     if (racing || counting || players.length < MIN) return;
     setMsg('');
     finished = [];
