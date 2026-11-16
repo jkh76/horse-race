@@ -1,6 +1,6 @@
 {
-  "name": "경주마 레이스",
-  "short_name": "경주마 레이스",
+  "name": "경마 레이스",
+  "short_name": "경마 레이스",
   "start_url": "./",
   "display": "browser",
   "background_color": "#D8F3E6",
