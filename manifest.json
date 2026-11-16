@@ -1,0 +1,22 @@
+{
+  "name": "경주마 레이스",
+  "short_name": "경주마 레이스",
+  "start_url": "./",
+  "display": "browser",
+  "background_color": "#D8F3E6",
+  "theme_color": "#12A15F",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
