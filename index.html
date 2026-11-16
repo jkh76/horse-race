@@ -920,7 +920,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.4 · 2026-11-16</p>
+  <p class="ver" id="ver">v1.42 · 2026-11-17</p>
 </main>
 
 <script>
@@ -1813,9 +1813,9 @@ input[type="text"]:disabled { opacity: 0.55; }
     renderRoster(); updateControls(); setStatus();
     laneEls.forEach(l => l.classList.add('running'));
 
-    /* 막판 슬로모션과 줌: 선두가 결승선 직전(95%)에 오면 경주 시간이 0.4배로 느려지고 화면이 선두 쪽으로 당겨짐.
+    /* 막판 슬로모션과 줌: 선두가 결승선 직전(95%)에 오면 경주 시간이 0.4배로 느려지고 화면이 선두 쪽으로 1.5배 당겨짐.
        1위가 들어온 뒤 0.3초가 지나면(실제 시간 최대 1.6초) 원래 속도로 돌아옴 */
-    const SLOW_RATE = 0.4, SLOW_FROM = 0.95, SLOW_AFTER = 0.3, SLOW_MAX = 1.6, ZOOM_MAX = 1.2;
+    const SLOW_RATE = 0.4, SLOW_FROM = 0.95, SLOW_AFTER = 0.3, SLOW_MAX = 1.6, ZOOM_MAX = 1.5;
     let lastNow = performance.now(), simT = 0, rate = 1, slowReal = 0, zoom = 1, zx = 0, zy = 0;
     scX = 0; ghostClock = 0;
     const frame = now => {
