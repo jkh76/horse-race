@@ -1,10 +1,40 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#12A15F"><meta name="apple-mobile-web-app-title" content="경마 레이스"></head><body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>경마 레이스</title>
+<!-- 홈 화면 아이콘·이름 -->
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12A15F">
+<meta name="apple-mobile-web-app-title" content="경마 레이스">
 <meta name="claude:viewport-fit-sides" content="cover">
+<!-- 글꼴 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
+/* =====================================================================
+   목차
+   1. 기본 설정 · 색상 변수(라이트/다크)
+   2. 머리말 · 참가자 입력 카드
+   3. LIVE 바 · 경주로 · 시작/다크호스 버튼 · 카운트다운
+   4. 경주 종료: 시상대 · 결승 판독 사진 · 폭죽
+   5. 말 그림 · 이름표 · 폭주 불꽃
+   6. 순위표
+   7. 경주 중 전체화면(가로) · 큰 PC 모니터
+   8. 경주 연출: 흐르는 배경 · 흙먼지 · 슬로모션
+   9. 움직임 줄이기 설정
+   ===================================================================== */
+
+/* ---------- 1. 기본 설정 · 색상 변수 ---------- */
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+img { max-width: 100%; }
+[hidden]:not([hidden=until-found i]) { display: none !important; }
+
 /* 레이아웃: 둥근 하늘색 무대 카드 한 장 안에 위에서 아래로 배지·제목 → 입력 카드 → LIVE 바 → 초록 테두리 흙길 경주로 → 메달 순위표. */
 :root {
   --page: #F4F6F9;
@@ -199,6 +229,7 @@ body {
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* ---------- 2. 머리말 · 참가자 입력 카드 ---------- */
 .hero { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .badge {
   display: inline-block;
@@ -346,6 +377,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 .x:disabled { opacity: 0.35; cursor: not-allowed; }
 .roster-empty { grid-column: 1 / -1; padding: 14px; border: 1.5px dashed var(--pill-line); border-radius: 16px; color: var(--muted); font-size: 14px; text-align: center; }
 
+/* ---------- 3. LIVE 바 · 경주로 · 시작/다크호스 버튼 · 카운트다운 ---------- */
 .live {
   display: flex;
   align-items: center;
@@ -402,7 +434,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   width: 14px;
   background: repeating-conic-gradient(#F4F5F7 0% 25%, #15171D 0% 50%) 0 0 / 14px 14px;
 }
-.lane { position: relative; height: var(--lh); }
+.lane { position: relative; flex: none; height: var(--lh); }
 .lane + .lane { border-top: 2px dashed var(--dirt-line); }
 .numbadge {
   position: absolute;
@@ -464,10 +496,12 @@ input[type="text"]:disabled { opacity: 0.55; }
 .countdown span.go { width: 128px; height: 128px; background: #E11D48; font-size: 38px; }
 @keyframes cdpop { from { transform: scale(1.7); opacity: 0; } 60% { opacity: 1; } to { transform: scale(1); opacity: 1; } }
 
-.stage.done .lanes { min-height: 290px; display: flex; flex-direction: column; justify-content: center; }
+/* ---------- 4. 경주 종료: 시상대 · 결승 판독 사진 · 폭죽 ---------- */
+/* 경주가 끝나면 시상대·판독 사진·버튼이 들어가도록 경주로를 늘림 */
+.stage.done .lanes { min-height: 420px; display: flex; flex-direction: column; justify-content: center; }
+.stage.done.hasdh .lanes { min-height: 470px; } /* 다크호스 모드 버튼(약 50px)만큼 여유 */
 /* 전체화면 경주 중에는 우승 표시가 나와도 말 위치가 밀리지 않도록 높이를 늘리지 않음 */
 .arena.full .stage.done .lanes { min-height: 0; }
-.lane { flex: none; }
 .winner {
   width: min(100%, 340px);
   padding: 10px 10px 0;
@@ -557,13 +591,12 @@ input[type="text"]:disabled { opacity: 0.55; }
 .pfrk { position: absolute; top: 4px; left: 5px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; background: rgba(0, 0, 0, 0.45); color: #fff; font-family: var(--font-display); font-size: 12px; line-height: 1; }
 .pfimg::after { content: ""; position: absolute; inset: 0; z-index: 3; background: #fff; opacity: 0; pointer-events: none; animation: pflash 0.8s ease-out 0.9s; }
 @keyframes pflash { 0% { opacity: 0; } 10% { opacity: 0.95; } 100% { opacity: 0; } }
-.stage.done .lanes { min-height: 420px; }
-.stage.done.hasdh .lanes { min-height: 470px; } /* 다크호스 모드 버튼(약 50px)만큼 여유 */
 /* 전체화면(가로) 동안에는 공간이 좁아 판독 사진을 숨기고, 원래 화면으로 돌아오면 표시 (큰 PC 모니터는 그대로 표시) */
 .arena.full:not(.big) .pfoto { display: none; }
 @keyframes drop { from { transform: translateY(-30px) scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
 .confetti { position: absolute; inset: 0; z-index: 6; width: 100%; height: 100%; pointer-events: none; }
 
+/* ---------- 5. 말 그림 · 이름표 · 폭주 불꽃 ---------- */
 .horse { position: absolute; left: 0; bottom: 4px; width: var(--hw); will-change: transform; }
 .horse::after { content: ""; position: absolute; left: 12%; right: 8%; bottom: -3px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, 0.22); filter: blur(2px); z-index: -1; }
 .horse svg { display: block; width: 100%; height: auto; overflow: visible; fill: currentColor; }
@@ -616,6 +649,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 .rk { margin-right: -4px; padding: 3px 6px; border-radius: 999px; background: rgba(0, 0, 0, 0.24); font-size: 11px; font-weight: 700; animation: pop 0.3s ease-out; }
 @keyframes pop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
 
+/* ---------- 6. 순위표 ---------- */
 .results { border-color: var(--res-line); background: linear-gradient(180deg, var(--card), var(--res-tint)); }
 .rhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
 .rhead h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1.2; }
@@ -651,6 +685,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 /* 버전 표시: push할 때마다 숫자와 날짜를 올림 */
 .ver { margin: 14px 0 0; color: var(--muted); font-size: 12px; text-align: center; opacity: 0.8; }
 
+/* ---------- 7. 경주 중 전체화면(가로) · 큰 PC 모니터 ---------- */
 /* 경주 중 전체 화면 모드: LIVE 바 + 경주로가 화면을 꽉 채움 */
 .arena { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .arena.full {
@@ -776,6 +811,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 
 @keyframes arenaIn { from { opacity: 0.4; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 
+/* ---------- 8. 경주 연출: 흐르는 배경 · 흙먼지 · 슬로모션 ---------- */
 /* 경주 배경(구름·관중석·펜스): 전체화면 경주 때만 경주로 위에 보이며 서로 다른 속도로 흐름 */
 .scenery {
   display: none;
@@ -801,6 +837,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 .stage.slow .running .leg, .stage.slow .running .low { animation-duration: 1.15s; }
 .stage.slow .running .tail { animation-duration: 0.6s; }
 
+/* ---------- 9. 움직임 줄이기 설정 ---------- */
 @media (prefers-reduced-motion: reduce) {
   .slowfx { transition: none; }
   .arena.full { animation: none; }
@@ -810,6 +847,8 @@ input[type="text"]:disabled { opacity: 0.55; }
   .res, .rk { animation: none; }
 }
 </style>
+</head>
+<body>
 
 <main class="app">
   <div class="stage-card">
@@ -881,13 +920,24 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.3 · 2026-11-16</p>
+  <p class="ver" id="ver">v1.4 · 2026-11-16</p>
 </main>
 
 <script>
+/* =====================================================================
+   목차
+   1. 설정값 · 화면 요소
+   2. 경주 연출 (흐르는 배경 · 흙먼지 · 불꽃 잔상)
+   3. 효과음
+   4. 말 그림 · 색상
+   5. 참가자 목록 · 화면 상태 · 시상대 · 판독 사진
+   6. 경주로 배치 · 전체화면 · 화면 켜짐 유지
+   7. 중계 멘트 · 순위 · 경주 진행
+   8. 폭죽 · 카운트다운
+   9. 버튼 · 입력 처리 · 시작
+   ===================================================================== */
 (() => {
-  document.documentElement.lang = 'ko';
-
+  /* ---------- 1. 설정값 · 화면 요소 ---------- */
   const MIN = 2, MAX = 8;
   const PALETTE = ['#E53935', '#2F7DF0', '#18A957', '#F59E0B', '#8E44C9', '#E8579A', '#12B5C9', '#D4D91C'];
   const MEDAL = ['🥇', '🥈', '🥉'];
@@ -908,6 +958,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   const sceneryEl = $('scenery'), scLayers = sceneryEl.querySelectorAll('.sc');
   const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
+  /* ---------- 2. 경주 연출 (흐르는 배경 · 흙먼지 · 불꽃 잔상) ---------- */
   /* 배경 그림(구름·관중석·펜스)을 SVG 타일로 만들어 가로로 반복 */
   const svgURI = str => 'url("data:image/svg+xml,' + encodeURIComponent(str) + '")';
   (function buildScenery() {
@@ -939,10 +990,11 @@ input[type="text"]:disabled { opacity: 0.55; }
   })();
   /* 배경 흐름: 구름은 천천히, 관중석은 중간, 펜스는 빠르게 */
   let scX = 0;
-  const SC_SPEED = [0.12, 1, 2.6];
+  const SC_BASE = 50.7;              /* 관중석 기준 흐름 속도(px/초, 띠 높이 40px 기준) */
+  const SC_SPEED = [0.12, 1, 2.6];   /* 구름 · 관중석 · 펜스 배율 */
   function scrollScenery(dt, k) {
     const h = sceneryEl.clientHeight || 40;
-    scX += dt * k * 95 * (2 / 3) * 0.8 * (h / 40); /* 기본 속도의 2/3에서 다시 80% */
+    scX += dt * k * SC_BASE * (h / 40);
     scLayers.forEach((el, i) => { el.style.backgroundPositionX = (-(scX * SC_SPEED[i]) % 100000).toFixed(1) + 'px'; });
   }
 
@@ -1059,6 +1111,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   let finished = [], pos = [], laneEls = [], horseEls = [], tagEls = [], tagW = [], badgeEls = [], finRank = [];
   let laneW = 0, hw = 0, raf = 0, lastT = 0, doneAt = [];
 
+  /* ---------- 3. 효과음 ---------- */
   /* 효과음 (WebAudio, 버튼을 누른 뒤에만 재생) */
   let soundOn = true, ac = null, music = null;
   const audio = () => {
@@ -1235,6 +1288,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     end: () => fanfare()
   };
 
+  /* ---------- 4. 말 그림 · 색상 ---------- */
   /* 말 색상 위에서 읽히는 글자색 (WCAG 대비가 큰 쪽) */
   const lin = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   const textOn = hex => {
@@ -1286,6 +1340,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     return s + '</svg>';
   };
 
+  /* ---------- 5. 참가자 목록 · 화면 상태 · 시상대 · 판독 사진 ---------- */
   const setMsg = t => { msgEl.textContent = t || ''; };
   const freeColor = () => {
     const used = players.map(p => p.color);
@@ -1430,6 +1485,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     liveEl.classList.toggle('on', racing);
   }
 
+  /* ---------- 6. 경주로 배치 · 전체화면 · 화면 켜짐 유지 ---------- */
   function measure() {
     const lane = lanesEl.querySelector('.lane');
     if (!lane) { laneW = 0; hw = 0; return; }
@@ -1605,6 +1661,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* 무시 */ }
   }
 
+  /* ---------- 7. 중계 멘트 · 순위 · 경주 진행 ---------- */
   /* 경마장 아나운서 멘트: 선두 진행도와 선두 교체에 맞춰 LIVE 바에 표시 */
   let cm = { text: '', t: -9, phase: -1, lead: -1, k: 0 }, midName = null;
   const iga = n => { const c = n.charCodeAt(n.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0) ? '이' : '가'; };
@@ -1735,11 +1792,12 @@ input[type="text"]:disabled { opacity: 0.55; }
       c: 0, fin: 0, last: 0, done: false
     }));
     const maxT = Math.max(...race.map(r => r.T));
-    /* 폭주(다크호스): 경주 거리별로 500m 1마리, 750m 2마리, 1,000m 3마리.
+    /* 폭주(다크호스): 경주 거리별로 500m 1마리, 750m 2마리, 1,000m 3마리. 단 '말 수 − 3'마리를 넘지 않음
+       (예: 4마리면 1마리, 5마리면 최대 2마리). 그래서 폭주할 때마다 후보가 반드시 한 마리 이상 남음.
        선두가 50~75% 구간의 무작위 지점들을 지날 때마다, 그 순간 1~3위가 아니고 아직 폭주하지 않은 말 중 하나가
        경주 길이별 시간(500m 1.5초, 750m 2.3초, 1,000m 3초) 동안 1.2배 속도로 달림. 참가자가 4명 이상일 때만 발생 */
     const BOOST_MUL = 1.2, BOOST_SEC = ({ 10: 1.5, 15: 2.3, 20: 3 })[getDur()] || 1.5;
-    const BOOST_N = darkHorse && n >= 4 ? (({ 10: 1, 15: 2, 20: 3 })[getDur()] || 1) : 0;
+    const BOOST_N = darkHorse && n >= 4 ? Math.min(n - 3, ({ 10: 1, 15: 2, 20: 3 })[getDur()] || 1) : 0;
     const boostAts = Array.from({ length: BOOST_N }, (_, k) => 0.5 + (k + Math.random()) * (0.25 / BOOST_N));
     const boosts = [];
     const boostOf = i => boosts.find(b => b.i === i);
@@ -1857,6 +1915,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     raf = requestAnimationFrame(frame);
   }
 
+  /* ---------- 8. 폭죽 · 카운트다운 ---------- */
   /* 축포: 경주로 양쪽 아래에서 색종이가 터져 올라감 (3번 연속) */
   let confRaf = 0, confTimers = [];
   function stopConfetti() {
@@ -1958,6 +2017,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     }, 3000);
   }
 
+  /* ---------- 9. 버튼 · 입력 처리 · 시작 ---------- */
   function removePlayer(id) {
     if (racing || counting) return;
     players = players.filter(p => p.id !== id);
@@ -2077,4 +2137,5 @@ input[type="text"]:disabled { opacity: 0.55; }
 })();
 </script>
 
-</body></html>
+</body>
+</html>
