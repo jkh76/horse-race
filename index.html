@@ -1665,6 +1665,20 @@ input[type="text"]:disabled { opacity: 0.55; }
     }
   }
 
+  /* 경주 전(전체화면이 아닐 때) 경주장 높이 상한: 폰 336px, 태블릿·PC 420px.
+     4마리까지는 원래 크기 그대로, 그보다 많으면 상한 안에 들어가도록 레인 높이와 말·이름표를 함께 줄임 */
+  const IDLE_VARS = ['--lh', '--hw', '--th'];
+  function fitIdle() {
+    if (isFull || !players.length) { IDLE_VARS.forEach(v => lanesEl.style.removeProperty(v)); return; }
+    const big = window.innerWidth >= 560;
+    const baseLh = big ? 88 : 70, baseHw = big ? 88 : 62, baseTh = big ? 22 : 20, maxH = big ? 420 : 336;
+    const lh = Math.min(baseLh, Math.floor(maxH / players.length));
+    if (lh >= baseLh) { IDLE_VARS.forEach(v => lanesEl.style.removeProperty(v)); return; }
+    lanesEl.style.setProperty('--lh', lh + 'px');
+    lanesEl.style.setProperty('--hw', Math.round(baseHw * lh / baseLh) + 'px');
+    lanesEl.style.setProperty('--th', clamp(Math.round(lh * 0.45), 16, baseTh) + 'px');
+  }
+
   function buildLanes() {
     clearFx(); resetCam();
     lanesEl.textContent = '';
@@ -1696,6 +1710,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     pos = players.map(() => 0);
     doneAt = players.map(() => null);
     finRank = players.map(() => null);
+    fitIdle();
     measure();
     applyPos(0);
   }
@@ -1767,6 +1782,7 @@ input[type="text"]:disabled { opacity: 0.55; }
     slotEl.style.height = arenaEl.offsetHeight + 'px';
     isFull = true;
     arenaEl.classList.add('full');
+    fitIdle(); /* 전체화면에서는 경주장 크기 조절(fitLanes)이 대신 맡음 */
     /* 회전된 요소는 전체화면 대상이 될 수 없으므로 문서 전체를 전체화면으로 (막히면 화면 가득 채우기만 적용) */
     try {
       const de = document.documentElement;
@@ -1806,7 +1822,8 @@ input[type="text"]:disabled { opacity: 0.55; }
     /* 줄어든 경주장 박스를 브라우저 화면 세로 중간에 맞춤 (전체화면 해제가 끝난 뒤 한 번 더) */
     const center = () => { try { arenaEl.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) { /* 무시 */ } };
     requestAnimationFrame(() => { fitWinner(); center(); });
-    setTimeout(() => { fitWinner(); measure(); applyPos(lastT); center(); }, 300);
+    fitIdle();
+    setTimeout(() => { fitWinner(); fitIdle(); measure(); applyPos(lastT); center(); }, 300);
     try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* 무시 */ }
   }
 
@@ -2283,7 +2300,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   });
 
   const remeasure = () => {
-    fitRot(); fitLanes(); measure(); applyPos(lastT); fitWinner();
+    fitRot(); fitLanes(); fitIdle(); measure(); applyPos(lastT); fitWinner();
   };
   if (window.ResizeObserver) { const ro = new ResizeObserver(remeasure); ro.observe(lanesEl); ro.observe(stageEl); }
   window.addEventListener('resize', remeasure);
