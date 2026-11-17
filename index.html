@@ -841,17 +841,21 @@ input[type="text"]:disabled { opacity: 0.55; }
 .arena.full .startbtn, .arena.full .dhbtn { display: none; }
 
 /* 세로 화면에서 시작하면 경주장을 시계방향 90도 돌려 가로 모드로 보여줌.
-   회전 전 기준 너비 = 화면 높이, 높이 = 화면 너비 (크기·위치는 JS가 지정) */
+   회전 전 기준 너비 = 화면 높이, 높이 = 화면 너비. 화면 가운데를 축으로 돌림 (크기·위치는 JS가 지정) */
 .arena.full.rot {
   inset: auto;
   top: 0;
   left: 0;
-  transform-origin: 0 0;
+  transform-origin: 50% 50%;
   transform: rotate(90deg);
   animation: none;
 }
-/* 폰을 반대쪽(시계방향)으로 눕혔으면 반시계방향 90도로 돌려 경주장이 거꾸로 보이지 않게 함 (위치는 JS가 지정) */
+/* 폰을 반대쪽(시계방향)으로 눕혔으면 반시계방향 90도로 돌려 경주장이 거꾸로 보이지 않게 함 */
 .arena.full.rot.ccw { transform: rotate(-90deg); }
+/* 경주 도중 방향이 바뀌면 반 바퀴 부드럽게 회전 (처음 전체화면에 들어갈 때는 바로 표시) */
+.arena.full.rot.rotanim { transition: transform 0.6s cubic-bezier(0.45, 0, 0.2, 1); }
+/* 회전하는 동안 모서리 뒤로 원래 페이지가 비치지 않도록 뒤를 하늘색으로 덮음 */
+body.fullrace::before { content: ""; position: fixed; inset: 0; z-index: 99; background: linear-gradient(180deg, var(--sky-a), var(--sky-b)); }
 
 /* 가로 전체화면에서는 시상대를 조금 낮춤 */
 .arena.full.landscape .winner { width: min(100%, 420px); padding-top: 8px; }
@@ -900,6 +904,7 @@ input[type="text"]:disabled { opacity: 0.55; }
 @media (prefers-reduced-motion: reduce) {
   .slowfx { transition: none; }
   .arena.full { animation: none; }
+  .arena.full.rot.rotanim { transition: none; }
   .running .leg, .running .low, .running .tail, .running .jockey, .horse.boost .flame path { animation: none; }
   .livebadge.on, .numbadge.bump, .countdown span, .winner, .podium li, .pfoto, .pfimg::after { animation: none; }
   .startbtn:not(:disabled), .arena.cheer .sc-crowd, .chip { animation: none; }
@@ -988,7 +993,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.52 · 2026-11-17</p>
+  <p class="ver" id="ver">v1.53 · 2026-11-17</p>
 </main>
 
 <script>
@@ -1759,8 +1764,9 @@ input[type="text"]:disabled { opacity: 0.55; }
     if (rot) {
       arenaEl.style.width = H + 'px';
       arenaEl.style.height = W + 'px';
-      if (tiltDir < 0) { arenaEl.style.left = '0px'; arenaEl.style.top = H + 'px'; }
-      else { arenaEl.style.left = W + 'px'; arenaEl.style.removeProperty('top'); }
+      /* 회전 축(상자 가운데)이 화면 가운데와 겹치도록 배치 */
+      arenaEl.style.left = (W - H) / 2 + 'px';
+      arenaEl.style.top = (H - W) / 2 + 'px';
     } else {
       ['width', 'height', 'left', 'top'].forEach(v => arenaEl.style.removeProperty(v));
     }
@@ -1806,6 +1812,9 @@ input[type="text"]:disabled { opacity: 0.55; }
     slotEl.style.height = arenaEl.offsetHeight + 'px';
     isFull = true;
     arenaEl.classList.add('full');
+    document.body.classList.add('fullrace');
+    /* 첫 배치가 끝난 뒤부터 방향 전환 애니메이션 사용 */
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (isFull) arenaEl.classList.add('rotanim'); }));
     fitIdle(); /* 전체화면에서는 경주장 크기 조절(fitLanes)이 대신 맡음 */
     /* 회전된 요소는 전체화면 대상이 될 수 없으므로 문서 전체를 전체화면으로 (막히면 화면 가득 채우기만 적용) */
     try {
@@ -1840,7 +1849,8 @@ input[type="text"]:disabled { opacity: 0.55; }
     isFull = false;
     allowSleep();
     clearTimeout(celebTimer);
-    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'ccw', 'big', 'cheer');
+    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'ccw', 'rotanim', 'big', 'cheer');
+    document.body.classList.remove('fullrace');
     ['--lh', '--hw', '--th', '--scn', 'width', 'height', 'left', 'top'].forEach(v => arenaEl.style.removeProperty(v));
     slotEl.style.height = '';
     /* 줄어든 경주장 박스를 브라우저 화면 세로 중간에 맞춤 (전체화면 해제가 끝난 뒤 한 번 더) */
