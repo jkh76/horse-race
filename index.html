@@ -850,6 +850,8 @@ input[type="text"]:disabled { opacity: 0.55; }
   transform: rotate(90deg);
   animation: none;
 }
+/* 폰을 반대쪽(시계방향)으로 눕혔으면 반시계방향 90도로 돌려 경주장이 거꾸로 보이지 않게 함 (위치는 JS가 지정) */
+.arena.full.rot.ccw { transform: rotate(-90deg); }
 
 /* 가로 전체화면에서는 시상대를 조금 낮춤 */
 .arena.full.landscape .winner { width: min(100%, 420px); padding-top: 8px; }
@@ -986,7 +988,7 @@ input[type="text"]:disabled { opacity: 0.55; }
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.5 · 2026-11-17</p>
+  <p class="ver" id="ver">v1.52 · 2026-11-17</p>
 </main>
 
 <script>
@@ -1728,17 +1730,39 @@ input[type="text"]:disabled { opacity: 0.55; }
   };
   /* 세로 화면이면 경주장을 시계방향 90도 회전해 가로 모드처럼 보여줌.
      폰을 실제로 가로로 돌리면 회전을 풀고 그대로 가로 화면을 사용 */
+  /* 폰을 어느 쪽으로 눕혔는지 중력 센서로 판별 (화면 회전 잠금이 켜져 있어도 동작).
+     폰 위쪽이 왼쪽으로 가게 눕히면(반시계) 경주장을 시계방향 90도, 오른쪽으로 눕히면(시계) 반시계방향 90도로 돌림.
+     센서 값이 없으면 지금처럼 시계방향 90도. 아이폰은 센서 부호가 반대라서 똑바로 세웠을 때의 값으로 보정함 */
+  let tiltDir = 1, gSign = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? -1 : 1, gCal = false;
+  window.addEventListener('devicemotion', e => {
+    const g = e.accelerationIncludingGravity;
+    if (!g || g.x == null || g.y == null) return;
+    /* 폰을 똑바로 세운 상태(세로 화면)라면 y가 +가 되어야 함: 반대면 부호를 뒤집어 씀 */
+    if (!gCal && Math.abs(g.y) > 6 && Math.abs(g.y) > Math.abs(g.x) * 2 && window.innerHeight > window.innerWidth) { gSign = g.y > 0 ? 1 : -1; gCal = true; }
+    const x = g.x * gSign;
+    if (Math.abs(x) < 6 || Math.abs(x) < Math.abs(g.y)) return; /* 충분히 눕혔을 때만 바꿈 */
+    const dir = x > 0 ? 1 : -1;
+    if (dir !== tiltDir) { tiltDir = dir; if (isFull) fitRot(); }
+  });
+  /* 아이폰은 센서 사용 허락을 버튼을 누른 순간에 받아야 함 */
+  function askMotion() {
+    try {
+      if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') DeviceMotionEvent.requestPermission().catch(() => {});
+    } catch (e) { /* 미지원이면 시계방향 고정 */ }
+  }
   function fitRot() {
     if (!isFull) return;
     const W = window.innerWidth, H = window.innerHeight;
     const rot = H > W;
     arenaEl.classList.toggle('rot', rot);
+    arenaEl.classList.toggle('ccw', rot && tiltDir < 0);
     if (rot) {
       arenaEl.style.width = H + 'px';
       arenaEl.style.height = W + 'px';
-      arenaEl.style.left = W + 'px';
+      if (tiltDir < 0) { arenaEl.style.left = '0px'; arenaEl.style.top = H + 'px'; }
+      else { arenaEl.style.left = W + 'px'; arenaEl.style.removeProperty('top'); }
     } else {
-      ['width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
+      ['width', 'height', 'left', 'top'].forEach(v => arenaEl.style.removeProperty(v));
     }
     /* 회전했거나 실제 가로 화면이면 가로용 압축 배치 사용 */
     const landscape = rot || W > H;
@@ -1816,8 +1840,8 @@ input[type="text"]:disabled { opacity: 0.55; }
     isFull = false;
     allowSleep();
     clearTimeout(celebTimer);
-    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'big', 'cheer');
-    ['--lh', '--hw', '--th', '--scn', 'width', 'height', 'left'].forEach(v => arenaEl.style.removeProperty(v));
+    arenaEl.classList.remove('full', 'wide', 'landscape', 'rot', 'ccw', 'big', 'cheer');
+    ['--lh', '--hw', '--th', '--scn', 'width', 'height', 'left', 'top'].forEach(v => arenaEl.style.removeProperty(v));
     slotEl.style.height = '';
     /* 줄어든 경주장 박스를 브라우저 화면 세로 중간에 맞춤 (전체화면 해제가 끝난 뒤 한 번 더) */
     const center = () => { try { arenaEl.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) { /* 무시 */ } };
@@ -2291,7 +2315,7 @@ input[type="text"]:disabled { opacity: 0.55; }
   });
 
   durInputs.forEach(i => i.addEventListener('change', () => { updateHead(); updateControls(); }));
-  startBtn.addEventListener('click', beginCountdown);
+  startBtn.addEventListener('click', () => { askMotion(); beginCountdown(); });
   dhBtn.addEventListener('click', () => {
     darkHorse = !darkHorse;
     dhBtn.setAttribute('aria-pressed', String(darkHorse));
