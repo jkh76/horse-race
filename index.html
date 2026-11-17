@@ -828,6 +828,13 @@ input[type="text"]:disabled { opacity: 0.55; }
 
 /* 큰 PC 모니터(마우스 사용 + 넓은 화면)에서만: 레인이 화면 높이를 채우도록 말·이름표·번호판을 키움.
    스마트폰·태블릿(터치)은 이 규칙이 적용되지 않음 */
+/* 큰 모니터에서는 경기장이 화면 전체로 늘어나지 않도록 최대 1680×1000px 상자로 제한하고 화면 가운데에 둠.
+   경주로 높이는 레인 수에 맞추고(말 최대 130px), 경주가 끝나면 시상대·판독 사진이 들어갈 최소 높이를 남김 */
+.arena.full.big { inset: 0; margin: auto; width: min(100%, 1680px); height: fit-content; max-height: 100%; justify-content: center; }
+.arena.full.big.landscape .trackframe, .arena.full.big.landscape .stage { flex: none; }
+/* 경주 중에는 경주로가 레인 높이에 맞고, 끝난 뒤에만 시상대·판독 사진 자리를 확보. 레인은 세로 가운데 */
+.arena.full.big.landscape .stage { display: flex; flex-direction: column; justify-content: center; }
+.arena.full.big.landscape .stage.done { min-height: 500px; }
 .arena.full.big.landscape .lanes { padding-left: 54px; padding-right: 16px; }
 .arena.full.big.landscape .lanes::before { left: 50px; width: 3px; }
 .arena.full.big.landscape .lanes::after { width: 16px; background-size: 16px 16px; }
@@ -993,7 +1000,7 @@ body.fullrace::before { content: ""; position: fixed; inset: 0; z-index: 99; bac
       <p class="empty" id="resultEmpty">결승선을 통과한 순서대로 1위부터 여기에 표시됩니다.</p>
     </section>
   </div>
-  <p class="ver" id="ver">v1.53 · 2026-11-17</p>
+  <p class="ver" id="ver">v1.55 · 2026-11-17</p>
 </main>
 
 <script>
@@ -1776,7 +1783,7 @@ body.fullrace::before { content: ""; position: fixed; inset: 0; z-index: 99; bac
     arenaEl.classList.toggle('big', isBigScreen() && !rot);
     arenaEl.classList.toggle('wide', landscape || players.length <= 4);
     /* 배경 띠 높이: 경주장 높이의 약 11% */
-    const ah = rot ? W : H;
+    const ah = rot ? W : (arenaEl.classList.contains('big') ? Math.min(H, 1000) : H);
     arenaEl.style.setProperty('--scn', clamp(Math.round(ah * 0.13), 30, 130) + 'px');
   }
   function fitLanes() {
@@ -1787,11 +1794,13 @@ body.fullrace::before { content: ""; position: fixed; inset: 0; z-index: 99; bac
          적은 인원은 말을 크게, 8명은 화면 안에 모두 들어오도록 자동 축소합니다. */
       const available = Math.max(160, stageEl.clientHeight - 8);
       if (arenaEl.classList.contains('big')) {
-        /* 큰 PC 모니터: 레인이 경주장 높이를 위아래 꽉 채우도록 나누고, 말은 너무 커지지 않게 상한을 둠 */
-        const lh = Math.max(60, Math.floor(available / players.length));
+        /* 큰 PC 모니터: 경기장 상자(최대 높이 1000px)에서 LIVE 바·배경 띠 등을 뺀 높이를 레인 수로 나누되,
+           레인은 최대 130px까지만 키워 말이 지나치게 커지지 않게 함 */
+        const room = Math.min(window.innerHeight, 1000) - 340;
+        const lh = clamp(Math.floor(room / players.length), 60, 130);
         arenaEl.style.setProperty('--lh', lh + 'px');
-        arenaEl.style.setProperty('--hw', clamp(lh * 1.0, 70, 240) + 'px');
-        arenaEl.style.setProperty('--th', clamp(lh * 0.22, 22, 40) + 'px');
+        arenaEl.style.setProperty('--hw', clamp(lh * 1.0, 60, 130) + 'px');
+        arenaEl.style.setProperty('--th', clamp(lh * 0.22, 22, 30) + 'px');
         return;
       }
       const lh = clamp(Math.floor(available / players.length), 22, 104);
